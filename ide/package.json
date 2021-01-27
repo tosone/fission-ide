@@ -14,6 +14,33 @@
     ],
     "main": "./dist/extension.js",
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "Fission-IDE",
+                    "title": "Fission IDE",
+                    "icon": "media/dep.svg"
+                }
+            ]
+        },
+        "views": {
+            "Fission-IDE": [
+                {
+                    "id": "fission-function",
+                    "name": "Function"
+                },
+                {
+                    "id": "fission-package",
+                    "name": "Package",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "fission-router",
+                    "name": "Router",
+                    "visibility": "collapsed"
+                }
+            ]
+        },
         "commands": [
             {
                 "command": "fission-ide.helloWorld",
