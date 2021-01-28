@@ -1600,6 +1600,11 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
+original-fs@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/original-fs/-/original-fs-1.1.0.tgz#f856f031b9e24c082ed35b497c9fd4b29f2c031f"
+  integrity sha512-LhW6DNoXdp8oo+Wv6N/QcxNrX/lE8McIySZ1O7llfJut4qA1Sfoy8BjHHWD6lHQMEdoFL+fosGK/DJSkQ5CP2g==
+
 p-limit@^2.0.0, p-limit@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-2.3.0.tgz"
@@ -2196,10 +2201,10 @@ webpack-sources@^2.1.1:
     source-list-map "^2.0.1"
     source-map "^0.6.1"
 
-webpack@^5.17.0:
-  version "5.17.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.17.0.tgz"
-  integrity sha512-R+IdNEaYcYaACpXZOt7reyc8txBK7J06lOPkX1SbgmeoAnUbyBZivJIksrDBnmMA3wlTWvPcX7DubxELyPB8rA==
+webpack@^5.18.0:
+  version "5.18.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.18.0.tgz#bbcf13094aa0da0534d513f27d7ee72d74e499c6"
+  integrity sha512-RmiP/iy6ROvVe/S+u0TrvL/oOmvP+2+Bs8MWjvBwwY/j82Q51XJyDJ75m0QAGntL1Wx6B//Xc0+4VPP/hlNHmw==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.46"
