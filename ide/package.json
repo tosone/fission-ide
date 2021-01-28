@@ -2,6 +2,7 @@
     "name": "fission-ide",
     "displayName": "fission-ide",
     "description": "",
+    "publisher": "Tosone",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.52.0"
@@ -102,15 +103,20 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "yarn run package",
         "compile": "npm-run-all compile:*",
         "compile:vscode": "webpack --config ./build/webpack.vscode.js",
         "compile:views": "webpack --mode production --config ./build/webpack.view.js",
         "watch": "npm-run-all -p watch:*",
         "watch:vscode": "webpack --watch --config ./build/webpack.vscode.js",
         "watch:views": "webpack --watch --mode development --config ./build/webpack.view.js",
-        "package": "webpack --mode production --devtool hidden-source-map --config ./build/webpack.vscode.js",
+        "vscode:prepublish": "npm-run-all package:*",
+        "package:views": "webpack --mode production --devtool hidden-source-map --config ./build/webpack.view.js",
+        "package:vscode": "webpack --mode production --devtool hidden-source-map --config ./build/webpack.vscode.js",
         "lint": "eslint src --ext ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tosone/fission-ide"
     },
     "devDependencies": {
         "@types/adm-zip": "^0.4.33",
