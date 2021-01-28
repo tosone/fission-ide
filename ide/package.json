@@ -23,7 +23,7 @@
                 {
                     "id": "fission-ide-bar",
                     "title": "Fission IDE",
-                    "icon": "media/dep.svg"
+                    "icon": "resources/function.svg"
                 }
             ]
         },
