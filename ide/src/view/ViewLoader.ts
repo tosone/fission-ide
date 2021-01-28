@@ -44,11 +44,11 @@ export default class ViewLoader {
   }
 
   private getWebviewContent(config: IConfig): string {
-    // Local path to main script run in the webview
-    const reactAppPathOnDisk = vscode.Uri.file(
-      path.join(this._extensionPath, "view", "deploy.js")
-    );
+    const reactAppPathOnDisk = vscode.Uri.file(path.join(this._extensionPath, "view", "deploy.js"));
     const reactAppUri = reactAppPathOnDisk.with({ scheme: "vscode-resource" });
+
+    const bundleOnDisk = vscode.Uri.file(path.join(this._extensionPath, "view", "bundle.js"));
+    const bundleUri = bundleOnDisk.with({ scheme: "vscode-resource" });
 
     const configJson = JSON.stringify(config);
 
@@ -72,7 +72,8 @@ export default class ViewLoader {
     </head>
     <body>
         <div id="root"></div>
-
+        
+        <script src="${bundleUri}"></script>
         <script src="${reactAppUri}"></script>
     </body>
     </html>`;
