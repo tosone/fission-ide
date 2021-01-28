@@ -2,10 +2,11 @@ const path = require("path");
 
 module.exports = {
     entry: {
-        configViewer: "./src/view/app/index.tsx"
+        deploy: "./src/view/app/deploy.tsx",
+        poolmgr: "./src/view/app/poolmgr.tsx"
     },
     output: {
-        path: path.resolve(__dirname, "configViewer"),
+        path: path.resolve(__dirname, '..', 'view'),
         filename: "[name].js"
     },
     devtool: "eval-source-map",
