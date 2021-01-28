@@ -1,11 +1,18 @@
 import * as path from 'path';
 
-import * as vscode from 'vscode';
 import axios from 'axios';
+import * as vscode from 'vscode';
 
 import constants from "./constants";
 
 export class FissionFunctionProvider implements vscode.TreeDataProvider<FissionFunction>{
+    private _onDidChangeTreeData: vscode.EventEmitter<FissionFunction | undefined | void> = new vscode.EventEmitter<FissionFunction | undefined | void>();
+    readonly onDidChangeTreeData: vscode.Event<FissionFunction | undefined | void> = this._onDidChangeTreeData.event;
+
+    refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
+
     getTreeItem(element: FissionFunction): vscode.TreeItem {
         return element;
     }
@@ -21,7 +28,14 @@ export class FissionFunctionProvider implements vscode.TreeDataProvider<FissionF
     async getFunction(): Promise<FissionFunction[]> {
         const resp = await axios.get(constants.UrlFunctions);
         return resp.data?.map((element: { metadata: { name: string; }; }) => {
-            return new FissionFunction(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
+            return new FissionFunction(element?.metadata?.name,
+                "nodejs",
+                vscode.TreeItemCollapsibleState.None,
+                {
+                    command: 'extension.openPackageOnNpm',
+                    title: 'ssss',
+                    arguments: []
+                });
         });
     }
 }
@@ -30,7 +44,8 @@ export class FissionFunction extends vscode.TreeItem {
     constructor(
         public readonly name: string,
         private readonly version: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly command?: vscode.Command
     ) {
         super(name, collapsibleState);
         this.tooltip = `${this.name}-${this.version}`;
