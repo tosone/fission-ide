@@ -10,6 +10,10 @@
         "Other"
     ],
     "activationEvents": [
+        "onView:fission-router",
+        "onView:fission-package",
+        "onView:fission-function",
+        "onView:fission-environment",
         "onCommand:fission-ide.helloWorld"
     ],
     "main": "./dist/extension.js",
@@ -17,14 +21,14 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "Fission-IDE",
+                    "id": "fission-ide-bar",
                     "title": "Fission IDE",
                     "icon": "media/dep.svg"
                 }
             ]
         },
         "views": {
-            "Fission-IDE": [
+            "fission-ide-bar": [
                 {
                     "id": "fission-function",
                     "name": "Function"
@@ -37,6 +41,11 @@
                 {
                     "id": "fission-router",
                     "name": "Router",
+                    "visibility": "collapsed"
+                },
+                {
+                    "id": "fission-environment",
+                    "name": "environment",
                     "visibility": "collapsed"
                 }
             ]
@@ -60,20 +69,23 @@
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
-        "@types/vscode": "^1.52.0",
         "@types/glob": "^7.1.3",
         "@types/mocha": "^8.2.0",
         "@types/node": "^14.14.22",
-        "eslint": "^7.18.0",
+        "@types/vscode": "^1.52.0",
         "@typescript-eslint/eslint-plugin": "^4.14.1",
         "@typescript-eslint/parser": "^4.14.1",
+        "eslint": "^7.18.0",
         "glob": "^7.1.6",
         "mocha": "^8.2.1",
+        "ts-loader": "^8.0.14",
         "typescript": "^4.1.3",
         "vscode-test": "^1.5.0",
-        "ts-loader": "^8.0.14",
         "webpack": "^5.17.0",
         "webpack-cli": "^4.4.0"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^0.21.1"
+    }
 }
