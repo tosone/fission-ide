@@ -57,11 +57,11 @@
             },
             {
                 "command": "fission-ide.deploy.poolmgr",
-                "title": "Fission function poolmgr deploy"
+                "title": "Fission Function PoolMgr"
             },
             {
                 "command": "fission-ide.deploy.newdeploy",
-                "title": "Fission function new deploy"
+                "title": "Fission Function NewDeploy"
             },
             {
                 "command": "fission-ide.function.delete",
@@ -103,34 +103,45 @@
     },
     "scripts": {
         "vscode:prepublish": "yarn run package",
-        "compile": "webpack --config ./build/node-extension.webpack.config.js",
-        "watch": "webpack --watch --config ./build/node-extension.webpack.config.js",
-        "package": "webpack --mode production --devtool hidden-source-map --config ./build/node-extension.webpack.config.js",
-        "test-compile": "tsc -p ./",
-        "test-watch": "tsc -watch -p ./",
-        "pretest": "yarn run test-compile && yarn run lint",
-        "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "compile": "npm-run-all compile:*",
+        "compile:vscode": "webpack --config ./build/webpack.vscode.js",
+        "compile:views": "webpack --mode production --config ./build/webpack.view.js",
+        "watch": "npm-run-all -p watch:*",
+        "watch:vscode": "webpack --watch --config ./build/webpack.vscode.js",
+        "watch:views": "webpack --watch --mode development --config ./build/webpack.view.js",
+        "package": "webpack --mode production --devtool hidden-source-map --config ./build/webpack.vscode.js",
+        "lint": "eslint src --ext ts"
     },
     "devDependencies": {
         "@types/adm-zip": "^0.4.33",
         "@types/glob": "^7.1.3",
         "@types/mocha": "^8.2.0",
         "@types/node": "^14.14.22",
+        "@types/react": "^17.0.0",
+        "@types/react-dom": "^17.0.0",
         "@types/vscode": "^1.52.0",
         "@typescript-eslint/eslint-plugin": "^4.14.1",
         "@typescript-eslint/parser": "^4.14.1",
+        "adm-zip": "^0.5.2",
+        "antd": "^4.11.2",
+        "axios": "^0.21.1",
+        "css-loader": "^5.0.1",
         "eslint": "^7.18.0",
         "glob": "^7.1.6",
+        "jquery": "^3.5.1",
         "mocha": "^8.2.1",
+        "original-fs": "^1.1.0",
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1",
+        "sass": "^1.32.5",
+        "sass-loader": "^10.1.1",
+        "style-loader": "^2.0.0",
         "ts-loader": "^8.0.14",
         "typescript": "^4.1.3",
         "vscode-test": "^1.5.0",
         "webpack": "^5.18.0",
         "webpack-cli": "^4.4.0",
-        "adm-zip": "^0.5.2",
-        "axios": "^0.21.1",
-        "original-fs": "^1.1.0"
+        "npm-run-all": "^4.1.5"
     },
     "license": "MIT"
 }
