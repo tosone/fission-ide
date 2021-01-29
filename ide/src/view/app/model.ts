@@ -3,6 +3,7 @@ export interface IConfig {
   description: string;
   users: IUser[];
 }
+
 export interface IUser {
   name: string;
   active: boolean;

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { IConfig, IUser, ICommand, CommandAction } from "./model";
 
-import { Card } from 'antd';
+import { Form, Input, Button, Select } from 'antd';
 
 interface IConfigProps {
   vscode: any;
@@ -10,12 +10,18 @@ interface IConfigProps {
 
 interface IConfigState {
   config: IConfig;
+  executor: string;
 }
 
-export default class Config extends React.Component<
-  IConfigProps,
-  IConfigState
-  > {
+const layout = {
+  labelCol: { span: 3 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 3, span: 16 },
+};
+
+export default class Config extends React.Component<IConfigProps, IConfigState> {
   constructor(props: any) {
     super(props);
 
@@ -25,7 +31,7 @@ export default class Config extends React.Component<
     if (oldState) {
       this.state = oldState;
     } else {
-      this.state = { config: initialData };
+      this.state = { config: initialData, executor: "poolmgr" };
     }
   }
 
@@ -36,14 +42,21 @@ export default class Config extends React.Component<
 
   onChangeUserActiveState(userIndex: number) {
     let newState = { ...this.state };
-    newState.config.users[userIndex].active = !newState.config.users[userIndex]
-      .active;
+    newState.config.users[userIndex].active = !newState.config.users[userIndex].active;
 
     this.defineState(newState);
   }
 
+  onFinish = (values: any) => {
+    console.log('Success:', values);
+  }
+
+  onFinishFailed(errorInfo: any) {
+    console.log('Failed:', errorInfo);
+  }
+
   onAddRole(event: React.KeyboardEvent<HTMLInputElement>, userIndex: number) {
-    if (event.keyCode === 13 && event.currentTarget.value !== "") {
+    if (event.key === "Enter" && event.currentTarget.value !== "") {
       let newState = { ...this.state };
       newState.config.users[userIndex].roles.push(event.currentTarget.value);
       this.defineState(newState);
@@ -52,7 +65,7 @@ export default class Config extends React.Component<
   }
 
   onAddUser(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.keyCode === 13 && event.currentTarget.value !== "") {
+    if (event.key === "Enter" && event.currentTarget.value !== "") {
       let newState = { ...this.state };
       let newUser: IUser = {
         name: event.currentTarget.value,
@@ -65,74 +78,55 @@ export default class Config extends React.Component<
     }
   }
 
-  renderUsers(users: IUser[]) {
-    return (
-      <React.Fragment>
-        <>
-          <Card title="Default size card" extra={<a href="#">More</a>} style={{ width: 300 }}>
-            <p>Card content</p>
-            <p>Card content</p>
-            <p>Card content</p>
-          </Card>
-          <Card size="small" title="Small size card" extra={<a href="#">More</a>} style={{ width: 300 }}>
-            <p>Card content</p>
-            <p>Card content</p>
-            <p>Card content</p>
-          </Card>
-        </>
-        <h2>User List :</h2>
-        <ul className="">
-          {users && users.length > 0
-            ? users.map((user, userIndex) => {
-              let roles =
-                user.roles && user.roles.length > 0
-                  ? user.roles.join(",")
-                  : null;
-
-              return (
-                <li key={userIndex}>
-                  {user.name}
-                  <br />
-                    Is active :{" "}
-                  <input
-                    type="checkbox"
-                    checked={user.active}
-                    onChange={() => this.onChangeUserActiveState(userIndex)}
-                  />
-                  <br />
-                    Roles : {roles}
-                  <input
-                    type="text"
-                    placeholder="Add Role"
-                    onKeyUp={event => this.onAddRole(event, userIndex)}
-                  />
-                </li>
-              );
-            })
-            : null}
-        </ul>
-        <input
-          type="text"
-          placeholder="Add User"
-          onKeyUp={event => this.onAddUser(event)}
-        />
-      </React.Fragment>
-    );
+  executorChange = (val: string) => {
+    this.setState({ executor: val });
   }
 
   render() {
     return (
       <React.Fragment>
-        <h1>Config name : {this.state.config.name}</h1>{" "}
-        {this.state.config.description}
-        {this.renderUsers(this.state.config.users)}
-        <br />
-        <input
-          className="save"
-          type="button"
-          value="Save the configuration"
-          onClick={() => this.saveConfig()}
-        />
+        <h1 className="title">Deploy Function</h1>
+        <Form
+          name="basic"
+          labelCol={{ span: 3 }}
+          wrapperCol={{ span: 21 }}
+          initialValues={{ remember: true }}
+          onFinish={this.onFinish}
+          onFinishFailed={this.onFinishFailed}
+        >
+          <Form.Item
+            label="Name"
+            name="functionName"
+            rules={[{ required: true, message: 'Please input the function name' }]}
+          >
+            <Input placeholder="Function name" />
+          </Form.Item>
+          <Form.Item
+            label="Executor"
+            name="executor"
+            rules={[{ required: true, message: 'Please select the function executor' }]}
+          >
+            <Select
+              defaultValue={"poolmgr"}
+              value={this.state.executor}
+              onChange={this.executorChange}
+            >
+              <Select.Option value="poolmgr">poolmgr</Select.Option>
+              <Select.Option value="newdeploy">newdeploy</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Min CPU"
+            name="minCPU"
+            rules={[{ required: true, message: 'Please input the min CPU request!' }]}
+            style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+          >
+            <Input type="number" defaultValue={1} placeholder="Min CPU" />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit">Create</Button>
+          </Form.Item>
+        </Form>
       </React.Fragment>
     );
   }
