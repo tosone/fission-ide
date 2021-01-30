@@ -47,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let deployStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
     deployStatusBarItem.command = DeployCommand;
-    deployStatusBarItem.text = "Deploy function";
+    deployStatusBarItem.text = "$(cloud-upload) Deploy function";
     context.subscriptions.push(deployStatusBarItem);
     deployStatusBarItem.show();
 }
