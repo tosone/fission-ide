@@ -85,7 +85,11 @@ export default class ViewDeploy {
     private getWebviewContent(config: IFunctionSpec): string {
         const reactAppPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, "view", "deploy.js"));
         const reactAppUri = reactAppPathOnDisk.with({ scheme: "vscode-resource" });
-        return constants.tmpl(config, reactAppUri);
+
+        const bundleOnDisk = vscode.Uri.file(path.join(this.extensionPath, "view", "bundle.js"));
+        const bundleUri = bundleOnDisk.with({ scheme: "vscode-resource" });
+
+        return constants.tmpl(config, bundleUri, reactAppUri);
     }
 }
 

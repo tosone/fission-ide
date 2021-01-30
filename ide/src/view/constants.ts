@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 
 import { IFunctionSpec } from "./model";
 
-const tmpl = (config: IFunctionSpec, reactAppUri: vscode.Uri) => {
+const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -22,6 +22,7 @@ const tmpl = (config: IFunctionSpec, reactAppUri: vscode.Uri) => {
     </head>
     <body>
         <div id="root"></div>
+        <script src="${bundleUri}"></script>
         <script src="${reactAppUri}"></script>
     </body>
     </html>`

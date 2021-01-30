@@ -40,4 +40,17 @@ module.exports = {
             },
         ]
     },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                defaultVendors: {
+                    filename: 'bundle.js'
+                }
+            }
+        },
+    },
+    performance: {
+        hints: false
+    }
 };
