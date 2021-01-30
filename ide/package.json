@@ -56,7 +56,7 @@
                 },
                 {
                     "id": "fission-environment",
-                    "name": "environment",
+                    "name": "Environment",
                     "visibility": "collapsed"
                 }
             ]
@@ -73,6 +73,30 @@
             {
                 "command": "fission-ide.function.test",
                 "title": "Test function"
+            },
+            {
+                "command": "fission-ide.function.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "fission-ide.environment.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "fission-ide.package.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
             }
         ],
         "menus": {
@@ -88,6 +112,23 @@
                     "when": "resourceLangId == javascript",
                     "command": "fission-ide.deploy",
                     "group": "fission@1"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "fission-ide.function.refresh",
+                    "when": "view == fission-function",
+                    "group": "navigation"
+                },
+                {
+                    "command": "fission-ide.environment.refresh",
+                    "when": "view == fission-environment",
+                    "group": "navigation"
+                },
+                {
+                    "command": "fission-ide.package.refresh",
+                    "when": "view == fission-package",
+                    "group": "navigation"
                 }
             ],
             "view/item/context": [

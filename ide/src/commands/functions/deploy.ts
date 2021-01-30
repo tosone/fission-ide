@@ -15,5 +15,4 @@ function Deploy(root: string | undefined) {
     vscode.window.showInformationMessage(`hello ${root}`);
 }
 
-
 export default Deploy;
