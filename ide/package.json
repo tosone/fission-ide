@@ -19,6 +19,16 @@
     ],
     "main": "./dist/extension.js",
     "contributes": {
+        "configuration": {
+            "title": "Fission",
+            "properties": {
+                "fission.server": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Fission controller server address, prefix with 'http://'."
+                }
+            }
+        },
         "viewsContainers": {
             "activitybar": [
                 {

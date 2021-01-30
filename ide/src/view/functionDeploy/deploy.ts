@@ -7,7 +7,7 @@ import axios from 'axios';
 import { IDeployCommand, CommandAction } from "./model";
 import { IFunctionSpec } from "../model";
 import * as constants from '../constants';
-import * as config from "../../constants";
+import config from "../../config";
 
 export default class ViewDeploy {
     private readonly panel: vscode.WebviewPanel | undefined;
@@ -59,7 +59,7 @@ export default class ViewDeploy {
     private functionNameTest(name: string) {
         console.log(name);
         let newCommand: IDeployCommand;
-        axios.get(config.default.UrlFunctions + "/" + name).then((resp) => {
+        axios.get(config().UrlFunctions + "/" + name).then((resp) => {
             if (resp.status !== 200) {
                 newCommand = {
                     action: CommandAction.NameNotExist,

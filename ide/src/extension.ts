@@ -29,6 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let DeployCommand = "fission-ide.deploy";
     context.subscriptions.push(vscode.commands.registerCommand(DeployCommand, (uri: vscode.Uri) => {
+        console.log(vscode.workspace.getConfiguration("fission").get("server"));
         if (uri == undefined) {
             if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
                 let rootFolder = vscode.workspace.workspaceFolders[0];

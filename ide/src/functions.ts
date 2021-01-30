@@ -3,7 +3,7 @@ import * as path from 'path';
 import axios from 'axios';
 import * as vscode from 'vscode';
 
-import constants from "./constants";
+import config from "./config";
 
 export class FissionFunctionProvider implements vscode.TreeDataProvider<FissionFunction>{
     private _onDidChangeTreeData: vscode.EventEmitter<FissionFunction | undefined | void> = new vscode.EventEmitter<FissionFunction | undefined | void>();
@@ -26,7 +26,7 @@ export class FissionFunctionProvider implements vscode.TreeDataProvider<FissionF
     }
 
     async getFunction(): Promise<FissionFunction[]> {
-        const resp = await axios.get(constants.UrlFunctions);
+        const resp = await axios.get(config().UrlFunctions);
         return resp.data?.map((element: { metadata: { name: string; }; }) => {
             return new FissionFunction(element?.metadata?.name,
                 "nodejs",
