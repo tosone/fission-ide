@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import Config from "./config";
-import { IFunctionSpec } from "../model";
+import Deploy from "./deploy";
+import { IFunctionSpec } from "../../model";
 
-import "./index.scss";
+import "../../index.scss";
 
 declare global {
   interface Window {
@@ -16,6 +16,6 @@ declare global {
 const vscode = window.acquireVsCodeApi();
 
 ReactDOM.render(
-  <Config vscode={vscode} initialData={window.initialData} />,
+  <Deploy vscode={vscode} initialData={window.initialData} />,
   document.getElementById("root")
 );

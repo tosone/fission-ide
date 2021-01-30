@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 
 import { IFunctionSpec } from "./model";
 
-const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
+const tmpl = (config: IFunctionSpec, reactAppUri: vscode.Uri) => {
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -15,7 +15,6 @@ const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.
                              img-src https:;
                              script-src 'unsafe-eval' 'unsafe-inline' vscode-resource:;
                              style-src vscode-resource: 'unsafe-inline';">
-
         <script>
           window.acquireVsCodeApi = acquireVsCodeApi;
           window.initialData = ${JSON.stringify(config)};
@@ -23,13 +22,11 @@ const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.
     </head>
     <body>
         <div id="root"></div>
-        
-        <script src="${bundleUri}"></script>
         <script src="${reactAppUri}"></script>
     </body>
     </html>`
 }
 
-export default {
-    tmpl: tmpl
+export {
+    tmpl
 };

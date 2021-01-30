@@ -1,4 +1,5 @@
 export interface IFunctionSpec {
+    path: string
     kind: string
     apiVersion: string
     metadata: {

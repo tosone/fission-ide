@@ -2,8 +2,7 @@ const path = require("path");
 
 module.exports = {
     entry: {
-        deploy: "./src/view/app/deploy.tsx",
-        poolmgr: "./src/view/app/poolmgr.tsx"
+        deploy: "./src/view/functionDeploy/page/index.tsx"
     },
     output: {
         path: path.resolve(__dirname, '..', 'view'),
@@ -41,17 +40,4 @@ module.exports = {
             },
         ]
     },
-    optimization: {
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                defaultVendors: {
-                    filename: 'bundle.js'
-                }
-            }
-        },
-    },
-    performance: {
-        hints: false
-    }
 };

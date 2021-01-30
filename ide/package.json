@@ -57,14 +57,6 @@
                 "title": "Fission function deploy"
             },
             {
-                "command": "fission-ide.deploy.poolmgr",
-                "title": "Fission Function PoolMgr"
-            },
-            {
-                "command": "fission-ide.deploy.newdeploy",
-                "title": "Fission Function NewDeploy"
-            },
-            {
                 "command": "fission-ide.function.delete",
                 "title": "Delete function"
             },

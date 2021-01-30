@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "compile",
+            "script": "compile:vscode",
             "problemMatcher": "$tsc-watch",
             "isBackground": true,
             "presentation": {

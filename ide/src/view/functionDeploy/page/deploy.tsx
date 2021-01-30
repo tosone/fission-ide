@@ -1,41 +1,63 @@
 import * as React from "react";
 
+
 import { Form, Input, Button, Select } from 'antd';
 
-import { CommandAction, IDeployCommand } from "./model";
-import { IFunctionSpec } from '../model';
+import { CommandAction, IDeployCommand } from "../model";
+import { IFunctionSpec } from '../../model';
 
-interface IConfigProps {
+export enum DeployAction { Create, Update }
+
+interface IDeployProps {
     vscode: any;
     initialData: IFunctionSpec;
 }
 
-interface IConfigState {
+interface IDeployState {
     functionSpec?: IFunctionSpec
+    deployAction: DeployAction
 }
 
-export default class Config extends React.Component<IConfigProps, IConfigState> {
+export default class Deploy extends React.Component<IDeployProps, IDeployState> {
     constructor(props: any) {
         super(props);
 
         let initialData = this.props.initialData;
         let vscode = this.props.vscode;
         if (vscode.getState()) {
-            this.state = { "executor": "poolmgr", ...vscode.getState() };
+            this.state = { ...vscode.getState() };
         } else {
             this.state = {
-                functionSpec: initialData
+                functionSpec: initialData,
+                deployAction: DeployAction.Create
             };
             vscode.setState({ ...this.state });
         }
+        this.listen();
     }
 
     saveFunctionSpec = () => {
         let command: IDeployCommand = {
-            action: CommandAction.Save,
+            action: CommandAction.Deploy,
             content: this.state.functionSpec
         };
         this.props.vscode.postMessage(command);
+    }
+
+    listen = () => {
+        window.addEventListener('message', event => {
+            const command: IDeployCommand = event.data;
+            switch (command.action) {
+                case CommandAction.NameExist:
+                    this.setState({ deployAction: DeployAction.Update });
+                    break;
+                case CommandAction.NameNotExist:
+                    this.setState({ deployAction: DeployAction.Create });
+                    break;
+                default:
+                    console.error(`Function deploy cannot find command ${command.action}`);
+            }
+        });
     }
 
     render() {
@@ -46,7 +68,38 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     name="basic"
                     labelCol={{ span: 3 }}
                     wrapperCol={{ span: 21 }}
+                    initialValues={{
+                        path: this.state.functionSpec.path,
+                        functionName: this.state.functionSpec.metadata.name,
+                        entryPoint: this.state.functionSpec.spec.package.functionName,
+                        packageName: this.state.functionSpec.spec.package.functionName,
+                        executor: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType,
+                        minCPU: parseInt(this.state.functionSpec.spec.resources.requests.cpu),
+                        maxCPU: parseInt(this.state.functionSpec.spec.resources.limits.cpu),
+                        minMem: parseInt(this.state.functionSpec.spec.resources.requests.memory),
+                        maxMem: parseInt(this.state.functionSpec.spec.resources.limits.memory),
+                        targetCPU: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent,
+                        minReplica: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale,
+                        maxReplica: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale,
+                    }}
                 >
+                    <Form.Item
+                        label="Path"
+                        name="path"
+                        extra="Package Path"
+                    >
+                        <Input
+                            type="text"
+                            placeholder="Package Path"
+                            value={this.state.functionSpec.path}
+                            readOnly
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.metadata.name = event.target.value;
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
+                    </Form.Item>
                     <Form.Item
                         label="Name"
                         name="functionName"
@@ -56,12 +109,16 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         <Input
                             type="text"
                             placeholder="Function name"
-                            defaultValue={this.state.functionSpec.metadata.name}
                             value={this.state.functionSpec.metadata.name}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 this.state.functionSpec.metadata.name = event.target.value;
                                 this.props.vscode.setState({ ...this.state });
                                 this.setState({ ...this.state });
+                                let command: IDeployCommand = {
+                                    action: CommandAction.NameTest,
+                                    content: this.state.functionSpec
+                                };
+                                this.props.vscode.postMessage(command);
                             }}
                         />
                     </Form.Item>
@@ -73,7 +130,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         <Input
                             type="text"
                             placeholder="Entry Point"
-                            defaultValue={this.state.functionSpec.spec.package.functionName}
                             value={this.state.functionSpec.spec.package.functionName}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 this.state.functionSpec.spec.package.functionName = event.target.value;
@@ -90,7 +146,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         <Input
                             type="text"
                             placeholder="Package name"
-                            defaultValue={this.state.functionSpec.spec.package.functionName}
                             value={this.state.functionSpec.spec.package.functionName}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 this.state.functionSpec.spec.package.functionName = event.target.value;
@@ -106,7 +161,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         extra="Executor type for execution; one of 'poolmgr', 'newdeploy'"
                     >
                         <Select
-                            defaultValue="poolmgr"
                             value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType}
                             onChange={(val: string) => {
                                 this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType = val;
@@ -126,7 +180,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={parseInt(this.state.functionSpec.spec.resources.requests.cpu)}
                             value={parseInt(this.state.functionSpec.spec.resources.requests.cpu)}
                             placeholder="Min CPU"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +197,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={parseInt(this.state.functionSpec.spec.resources.limits.cpu)}
                             value={parseInt(this.state.functionSpec.spec.resources.limits.cpu)}
                             placeholder="Max CPU"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +214,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={parseInt(this.state.functionSpec.spec.resources.requests.memory)}
                             value={parseInt(this.state.functionSpec.spec.resources.requests.memory)}
                             placeholder="Min Memory"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +231,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={parseInt(this.state.functionSpec.spec.resources.limits.memory)}
                             value={parseInt(this.state.functionSpec.spec.resources.limits.memory)}
                             placeholder="Max Memory"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,7 +248,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
                             value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
                             placeholder="Target CPU"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,7 +265,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
                             value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
                             placeholder="Min Replica"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -234,7 +282,6 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Input
                             type="number"
-                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
                             value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
                             placeholder="Max Replica"
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -245,7 +292,9 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         />
                     </Form.Item>
                     <Form.Item wrapperCol={{ offset: 3, span: 21 }}>
-                        <Button type="primary" htmlType="submit" onClick={this.saveFunctionSpec}>Create</Button>
+                        <Button type="primary" onClick={this.saveFunctionSpec}>{
+                            this.state.deployAction === DeployAction.Create ? "Create" : "Update"
+                        }</Button>
                     </Form.Item>
                 </Form>
             </React.Fragment>
