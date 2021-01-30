@@ -22,22 +22,62 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
         super(props);
 
         let initialData = this.props.initialData;
-        let oldState = this.props.vscode.getState();
-        console.log(oldState);
-        if (oldState) {
-            this.state = { "executor": "poolmgr", ...oldState };
+        let vscode = this.props.vscode;
+        if (vscode.getState()) {
+            this.state = { "executor": "poolmgr", ...vscode.getState() };
         } else {
             this.state = {
                 config: initialData,
                 executor: "poolmgr",
-                functionName: ""
+                functionName: "",
+                functionSpec: {
+                    kind: "Function",
+                    apiVersion: "fission.io/v1",
+                    metadata: {
+                        name: "",
+                        namespace: "default"
+                    },
+                    spec: {
+                        environment: {
+                            namespace: "default",
+                            name: ""
+                        },
+                        package: {
+                            packageref: {
+                                name: "",
+                                namespace: "default",
+                                resourceversion: ""
+                            },
+                            functionName: ""
+                        },
+                        resources: {
+                            limits: {
+                                cpu: "120m",
+                                memory: "100Mi"
+                            },
+                            requests: {
+                                cpu: "80m",
+                                memory: "50Mi"
+                            }
+                        },
+                        InvokeStrategy: {
+                            ExecutionStrategy: {
+                                ExecutorType: "poolmgr",
+                                MinScale: 2,
+                                MaxScale: 2,
+                                TargetCPUPercent: 80,
+                                SpecializationTimeout: 120
+                            },
+                            StrategyType: "execution"
+                        },
+                        functionTimeout: 60,
+                        idletimeout: 120,
+                        concurrency: 5
+                    }
+                }
             };
+            vscode.setState({ ...this.state });
         }
-        this.props.vscode.setState({ functionName: "val" });
-    }
-
-    executorChange = (val: string) => {
-        this.setState({ executor: val });
     }
 
     saveConfig() {
@@ -48,15 +88,7 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
         this.props.vscode.postMessage(command);
     }
 
-    functionNameOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.vscode.setState({ functionName: event.target.value });
-        this.setState({ functionName: event.target.value });
-        console.log(this.props.vscode.getState());
-    }
-
-    render = () => {
-        console.log(this.state.functionName)
-        console.log(this.state.executor)
+    render() {
         return (
             <React.Fragment>
                 <h1 className="title">Deploy Function</h1>
@@ -71,21 +103,51 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         rules={[{ required: true, message: 'Please input the function name' }]}
                         extra="Function name"
                     >
-                        <Input type="text" placeholder="Function name" defaultValue={this.state.functionName} value={this.state.functionName} onChange={this.functionNameOnChange} />
+                        <Input
+                            type="text"
+                            placeholder="Function name"
+                            defaultValue={this.state.functionSpec.metadata.name}
+                            value={this.state.functionSpec.metadata.name}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.metadata.name = event.target.value;
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Entry Point"
                         name="entryPoint"
                         extra="Entry point for environment v2 to load with"
                     >
-                        <Input placeholder="Entry Point" />
+                        <Input
+                            type="text"
+                            placeholder="Entry Point"
+                            defaultValue={this.state.functionSpec.spec.package.functionName}
+                            value={this.state.functionSpec.spec.package.functionName}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.package.functionName = event.target.value;
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Package name"
                         name="packageName"
                         extra="Name of the existing package (--deploy and --src and --env will be ignored), should be in the same namespace as the function"
                     >
-                        <Input placeholder="Package name" />
+                        <Input
+                            type="text"
+                            placeholder="Package name"
+                            defaultValue={this.state.functionSpec.spec.package.functionName}
+                            value={this.state.functionSpec.spec.package.functionName}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.package.functionName = event.target.value;
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Executor"
@@ -95,8 +157,12 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     >
                         <Select
                             defaultValue="poolmgr"
-                            value={this.state.executor}
-                            onChange={this.executorChange}
+                            value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType}
+                            onChange={(val: string) => {
+                                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType = val;
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
                         >
                             <Select.Option value="poolmgr">poolmgr</Select.Option>
                             <Select.Option value="newdeploy">newdeploy</Select.Option>
@@ -105,58 +171,128 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                     <Form.Item
                         label="Min CPU"
                         name="minCPU"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Minimum CPU to be assigned to pod (In millicore, minimum 1)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Min CPU" />
+                        <Input
+                            type="number"
+                            defaultValue={parseInt(this.state.functionSpec.spec.resources.requests.cpu)}
+                            value={parseInt(this.state.functionSpec.spec.resources.requests.cpu)}
+                            placeholder="Min CPU"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.resources.requests.cpu = event.target.value + "m";
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Max CPU"
                         name="maxCPU"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Maximum CPU to be assigned to pod (In millicore, minimum 1)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Max CPU" />
+                        <Input
+                            type="number"
+                            defaultValue={parseInt(this.state.functionSpec.spec.resources.limits.cpu)}
+                            value={parseInt(this.state.functionSpec.spec.resources.limits.cpu)}
+                            placeholder="Max CPU"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.resources.limits.cpu = event.target.value + "m";
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Min Memory"
                         name="minMem"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Minimum memory to be assigned to pod (In megabyte)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Min Memory" />
+                        <Input
+                            type="number"
+                            defaultValue={parseInt(this.state.functionSpec.spec.resources.requests.memory)}
+                            value={parseInt(this.state.functionSpec.spec.resources.requests.memory)}
+                            placeholder="Min Memory"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.resources.requests.memory = event.target.value + "Mi";
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Max Memory"
                         name="maxMem"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Maximum memory to be assigned to pod (In megabyte)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Max Memory" />
+                        <Input
+                            type="number"
+                            defaultValue={parseInt(this.state.functionSpec.spec.resources.limits.memory)}
+                            value={parseInt(this.state.functionSpec.spec.resources.limits.memory)}
+                            placeholder="Max Memory"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.resources.limits.memory = event.target.value + "Mi";
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Target CPU"
                         name="targetCPU"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Target average CPU usage percentage across pods for scaling (default: 80)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Max Memory" />
+                        <Input
+                            type="number"
+                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
+                            value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
+                            placeholder="Target CPU"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent = parseInt(event.target.value);
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Min Replica"
                         name="minReplica"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Minimum number of pods (Uses resource inputs to configure HPA)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Min Replica" />
+                        <Input
+                            type="number"
+                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
+                            value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
+                            placeholder="Min Replica"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale = parseInt(event.target.value);
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Max Replica"
                         name="maxReplica"
-                        style={{ display: this.state.executor == "poolmgr" ? "none" : "" }}
+                        style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
                         extra="Maximum number of pods (Uses resource inputs to configure HPA)"
                     >
-                        <Input type="number" defaultValue={1} placeholder="Max Replica" />
+                        <Input
+                            type="number"
+                            defaultValue={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
+                            value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
+                            placeholder="Max Replica"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale = parseInt(event.target.value);
+                                this.props.vscode.setState({ ...this.state });
+                                this.setState({ ...this.state });
+                            }}
+                        />
                     </Form.Item>
                     <Form.Item wrapperCol={{ offset: 3, span: 21 }}>
                         <Button type="primary" htmlType="submit">Create</Button>

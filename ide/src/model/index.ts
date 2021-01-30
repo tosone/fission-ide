@@ -4,11 +4,11 @@ export interface IFunctionSpec {
     metadata: {
         name: string
         namespace: string
-        selfLink: string
-        uid: string
-        resourceVersion: string
-        generation: number
-        creationTimestamp: string
+        selfLink?: string
+        uid?: string
+        resourceVersion?: string
+        generation?: number
+        creationTimestamp?: string
     }
     spec: {
         environment: {
@@ -21,16 +21,17 @@ export interface IFunctionSpec {
                 name: string
                 resourceversion: string
             }
+            functionName?: string
         }
-        secrets: {
+        secrets?: {
             namespace: string
             name: string
         }
-        configmaps: {
+        configmaps?: {
             namespace: string
             name: string
         }
-        resources: {
+        resources?: {
             limits: {
                 cpu: string
                 memory: string
@@ -40,13 +41,13 @@ export interface IFunctionSpec {
                 memory: string
             }
         }
-        InvokeStrategy: {
+        InvokeStrategy?: {
             ExecutionStrategy: {
                 ExecutorType: string
-                MinScale: number
-                MaxScale: number
-                TargetCPUPercent: number
-                SpecializationTimeout: number
+                MinScale?: number
+                MaxScale?: number
+                TargetCPUPercent?: number
+                SpecializationTimeout?: number
             }
             StrategyType: string
         }
