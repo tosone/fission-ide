@@ -1,14 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import "./index.scss";
-import { IConfig } from "./model";
 import Config from "./config";
+import { IFunctionSpec } from "../model";
+
+import "./index.scss";
 
 declare global {
   interface Window {
     acquireVsCodeApi(): any;
-    initialData: IConfig;
+    initialData: IFunctionSpec;
   }
 }
 

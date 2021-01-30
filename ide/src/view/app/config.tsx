@@ -2,19 +2,16 @@ import * as React from "react";
 
 import { Form, Input, Button, Select } from 'antd';
 
-import { IConfig, IUser, ICommand, CommandAction } from "./model";
-import { IFunctionSpec } from '../../model';
+import { CommandAction, IDeployCommand } from "./model";
+import { IFunctionSpec } from '../model';
 
 interface IConfigProps {
     vscode: any;
-    initialData: IConfig;
+    initialData: IFunctionSpec;
 }
 
 interface IConfigState {
-    config: IConfig
     functionSpec?: IFunctionSpec
-    executor: string
-    functionName: string
 }
 
 export default class Config extends React.Component<IConfigProps, IConfigState> {
@@ -27,63 +24,16 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
             this.state = { "executor": "poolmgr", ...vscode.getState() };
         } else {
             this.state = {
-                config: initialData,
-                executor: "poolmgr",
-                functionName: "",
-                functionSpec: {
-                    kind: "Function",
-                    apiVersion: "fission.io/v1",
-                    metadata: {
-                        name: "",
-                        namespace: "default"
-                    },
-                    spec: {
-                        environment: {
-                            namespace: "default",
-                            name: ""
-                        },
-                        package: {
-                            packageref: {
-                                name: "",
-                                namespace: "default",
-                                resourceversion: ""
-                            },
-                            functionName: ""
-                        },
-                        resources: {
-                            limits: {
-                                cpu: "120m",
-                                memory: "100Mi"
-                            },
-                            requests: {
-                                cpu: "80m",
-                                memory: "50Mi"
-                            }
-                        },
-                        InvokeStrategy: {
-                            ExecutionStrategy: {
-                                ExecutorType: "poolmgr",
-                                MinScale: 2,
-                                MaxScale: 2,
-                                TargetCPUPercent: 80,
-                                SpecializationTimeout: 120
-                            },
-                            StrategyType: "execution"
-                        },
-                        functionTimeout: 60,
-                        idletimeout: 120,
-                        concurrency: 5
-                    }
-                }
+                functionSpec: initialData
             };
             vscode.setState({ ...this.state });
         }
     }
 
-    saveConfig() {
-        let command: ICommand = {
+    saveFunctionSpec = () => {
+        let command: IDeployCommand = {
             action: CommandAction.Save,
-            content: this.state.config
+            content: this.state.functionSpec
         };
         this.props.vscode.postMessage(command);
     }
@@ -295,7 +245,7 @@ export default class Config extends React.Component<IConfigProps, IConfigState> 
                         />
                     </Form.Item>
                     <Form.Item wrapperCol={{ offset: 3, span: 21 }}>
-                        <Button type="primary" htmlType="submit">Create</Button>
+                        <Button type="primary" htmlType="submit" onClick={this.saveFunctionSpec}>Create</Button>
                     </Form.Item>
                 </Form>
             </React.Fragment>

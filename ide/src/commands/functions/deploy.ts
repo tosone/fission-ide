@@ -15,4 +15,18 @@ function Deploy(root: string | undefined) {
     vscode.window.showInformationMessage(`hello ${root}`);
 }
 
-export default Deploy;
+function Deploy1(root: string | undefined) {
+    var zip = new AdmZip();
+    if (root) {
+        zip.addLocalFolder(path.join(root, 'src'));
+    }
+    let archive = path.join(tmpdir(), 'sample.zip');
+    console.log(archive);
+    zip.writeZip(archive);
+
+    vscode.window.showInformationMessage(`hello ${root}`);
+}
+
+export {
+    Deploy, Deploy1
+};

@@ -1,3 +1,5 @@
+import { IFunctionSpec } from "../model";
+
 export interface IConfig {
   name: string;
   description: string;
@@ -10,9 +12,9 @@ export interface IUser {
   roles: string[];
 }
 
-export interface ICommand {
+export interface IDeployCommand {
   action: CommandAction;
-  content: IConfig;
+  content: IFunctionSpec;
 }
 
 export enum CommandAction {

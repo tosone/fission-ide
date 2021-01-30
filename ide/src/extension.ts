@@ -1,12 +1,16 @@
+import * as path from 'path';
+
 import * as vscode from 'vscode';
 
 import { FissionFunctionProvider, FissionFunction } from './functions';
 import { FissionPackageProvider } from './packages';
 import { FissionEnvironmentProvider } from './environments';
 
-import Deploy from "./commands/functions/deploy";
+import * as FunctionDeploy from "./commands/functions/deploy";
 import Delete from './commands/functions/delete';
-import ViewLoader from './view/ViewLoader';
+import ViewLoader from './view/deploy';
+
+const FissionConfig = ".fission.json";
 
 export function activate(context: vscode.ExtensionContext) {
     const fissionFunctionProvider = new FissionFunctionProvider();
@@ -23,38 +27,33 @@ export function activate(context: vscode.ExtensionContext) {
         fissionFunctionProvider.refresh();
     });
 
-    let helloCommand = "fission-ide.deploy";
-    let disposable = vscode.commands.registerCommand(helloCommand, () => {
-        if (vscode.workspace.workspaceFolders?.length == 1) {
-            return Deploy(vscode.workspace.workspaceFolders[0].uri.path);
+    let DeployCommand = "fission-ide.deploy";
+    context.subscriptions.push(vscode.commands.registerCommand(DeployCommand, (uri: vscode.Uri) => {
+        if (uri == undefined) {
+            if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+                let rootFolder = vscode.workspace.workspaceFolders[0];
+                let config = path.join(rootFolder.uri.fsPath, FissionConfig);
+                new ViewLoader(context.extensionPath, config);
+            } else {
+                vscode.window.showInformationMessage("Cannot find valid directory");
+            }
+        } else {
+            let rootFolder = path.dirname(uri.fsPath);
+            let config = path.join(rootFolder, FissionConfig);
+            new ViewLoader(context.extensionPath, config);
         }
-    });
-    context.subscriptions.push(disposable);
-
-    let DeployPoolMgrCommand = "fission-ide.deploy.poolmgr";
-    let deployPoolMgr = vscode.commands.registerCommand(DeployPoolMgrCommand, () => {
-        let uri = vscode.Uri.file("/Users/tosone/go/src/github.com/fission/reactception/Step 6/config.json");
-        new ViewLoader(uri, context.extensionPath);
-        // const panel = vscode.window.createWebviewPanel(
-        //     'catCoding', // Identifies the type of the webview. Used internally
-        //     'Cat Coding', // Title of the panel displayed to the user
-        //     vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-        //     {} // Webview options. More on these later.
-        // );
-        // panel.webview.html = getWebviewContent();
-    });
-    context.subscriptions.push(deployPoolMgr);
+    }))
 
     let DeployNewDeployCommand = "fission-ide.deploy.newdeploy";
     let deployNewDeploy = vscode.commands.registerCommand(DeployNewDeployCommand, () => {
         if (vscode.workspace.workspaceFolders?.length == 1) {
-            return Deploy(vscode.workspace.workspaceFolders[0].uri.path);
+            return FunctionDeploy.Deploy(vscode.workspace.workspaceFolders[0].uri.path);
         }
     });
     context.subscriptions.push(deployNewDeploy);
 
     let deployStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-    deployStatusBarItem.command = helloCommand;
+    deployStatusBarItem.command = DeployCommand;
     deployStatusBarItem.text = "Deploy function";
     context.subscriptions.push(deployStatusBarItem);
     deployStatusBarItem.show();
