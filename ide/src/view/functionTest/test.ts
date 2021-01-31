@@ -4,7 +4,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import axios from 'axios';
 
-import { IDeployCommand, CommandAction } from "./model";
+import { CommandAction, ITestCommand, ITestSpec } from "./model";
 import { IFunctionSpec } from "../model";
 import * as constants from '../constants';
 import config from "../../config";
@@ -36,13 +36,10 @@ export default class ViewDeploy {
 
       this.panel.webview.html = this.getWebviewContent(config);
 
-      this.panel.webview.onDidReceiveMessage((command: IDeployCommand) => {
+      this.panel.webview.onDidReceiveMessage((command: ITestCommand) => {
         switch (command.action) {
-          case CommandAction.Deploy:
-            this.saveConfigFile(configFile, command.content);
-            break;
-          case CommandAction.NameTest:
-            this.functionNameTest(command.content.metadata.name);
+          case CommandAction.Request:
+            this.request(configFile, command.content);
             break;
           default:
             vscode.window.showErrorMessage(`Function deploy cannot find command ${command.action}`);
@@ -51,35 +48,9 @@ export default class ViewDeploy {
     }
   }
 
-  private saveConfigFile(configFile: string, functionSpec: IFunctionSpec) {
+  private request(configFile: string, functionSpec: ITestSpec) {
     let content: string = JSON.stringify(functionSpec);
     fs.writeFileSync(configFile, content);
-  }
-
-  private functionNameTest(name: string) {
-    console.log(name);
-    let newCommand: IDeployCommand;
-    axios.get(config().UrlFunctions + "/" + name).then((resp) => {
-      if (resp.status !== 200) {
-        newCommand = {
-          action: CommandAction.NameNotExist,
-          content: defaultFunctionSpec
-        };
-      } else {
-        newCommand = {
-          action: CommandAction.NameExist,
-          content: defaultFunctionSpec
-        };
-      }
-      this.panel?.webview.postMessage(newCommand);
-    }).catch(err => {
-      console.error(`Function deploy search function '${name}' catch err: ${err.response.status}`)
-      newCommand = {
-        action: CommandAction.NameNotExist,
-        content: defaultFunctionSpec
-      };
-      this.panel?.webview.postMessage(newCommand);
-    })
   }
 
   private getWebviewContent(config: IFunctionSpec): string {

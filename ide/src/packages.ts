@@ -6,38 +6,38 @@ import axios from 'axios';
 import config from "./config";
 
 export class FissionPackageProvider implements vscode.TreeDataProvider<FissionPackage>{
-    getTreeItem(element: FissionPackage): vscode.TreeItem {
-        return element;
-    }
+  getTreeItem(element: FissionPackage): vscode.TreeItem {
+    return element;
+  }
 
-    getChildren(element?: FissionPackage): Thenable<FissionPackage[]> {
-        if (element) {
-            return Promise.resolve([]);
-        } else {
-            return Promise.resolve(this.getFunction());
-        }
+  getChildren(element?: FissionPackage): Thenable<FissionPackage[]> {
+    if (element) {
+      return Promise.resolve([]);
+    } else {
+      return Promise.resolve(this.getFunction());
     }
+  }
 
-    async getFunction(): Promise<FissionPackage[]> {
-        const resp = await axios.get(config().UrlPackages);
-        return resp.data?.map((element: { metadata: { name: string; }; }) => {
-            return new FissionPackage(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
-        });
-    }
+  async getFunction(): Promise<FissionPackage[]> {
+    const resp = await axios.get(config().UrlPackages);
+    return resp.data?.map((element: { metadata: { name: string; }; }) => {
+      return new FissionPackage(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
+    });
+  }
 }
 
 export class FissionPackage extends vscode.TreeItem {
-    constructor(
-        public readonly name: string,
-        private readonly version: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState
-    ) {
-        super(name, collapsibleState);
-        this.tooltip = `${this.name}-${this.version}`;
-        this.description = this.name;
-    }
+  constructor(
+    public readonly name: string,
+    private readonly version: string,
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState
+  ) {
+    super(name, collapsibleState);
+    this.tooltip = `${this.name}-${this.version}`;
+    this.description = this.name;
+  }
 
-    iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');
+  iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');
 
-    contextValue = 'dependency';
+  contextValue = 'dependency';
 }

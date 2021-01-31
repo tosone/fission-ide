@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { IFunctionSpec } from "./model";
 
 const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -29,5 +29,5 @@ const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.
 }
 
 export {
-    tmpl
+  tmpl
 };
