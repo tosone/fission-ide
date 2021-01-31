@@ -2,7 +2,7 @@ import React from "react";
 
 import { Menu } from 'antd';
 
-import './index.scss';
+import './index.css';
 
 function Header() {
     return (

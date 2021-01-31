@@ -1,0 +1,32 @@
+name: App build
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on: ubuntu-20.04
+
+        strategy:
+            matrix:
+                node-version: [15.x]
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup node sass env
+              run: echo "SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass" >> $GITHUB_ENV
+            - name: Setup electron env
+              run: echo "ELECTRON_MIRROR=http://npm.taobao.org/mirrors/electron/" >> $GITHUB_ENV
+            - name: Setup electron builder env
+              run: echo "ELECTRON_BUILDER_BINARIES_MIRROR=http://npm.taobao.org/mirrors/electron-builder-binaries/" >> $GITHUB_ENV
+            - name: Resolve the dependencies
+              run: yarn install
+            - name: Build the electron app
+              run: yarn run package

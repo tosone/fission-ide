@@ -6,7 +6,6 @@
     "antd": "^4.11.2",
     "dayjs": "^1.10.4",
     "lodash": "^4.17.20",
-    "node-sass": "^4.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.2",
@@ -37,7 +36,7 @@
     "test": "react-scripts test",
     "start-electron": "env ELECTRON_START_URL=http://localhost:3000 electron .",
     "build-electron": "mkdir build/src && cp -r electron build && cp -r src/shared build/src",
-    "package": "yarn run build && yarn run build-electron && electron-builder build --mac --win -c.extraMetadata.main=build/electron/main.js --publish never"
+    "package": "yarn run build && yarn run build-electron && electron-builder build -c.extraMetadata.main=build/electron/main.js --publish never"
   },
   "eslintConfig": {
     "extends": [
