@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import axios from 'axios';
 
-import config from "./config";
+import config from "./lib/config";
 
 export class FissionEnvironmentProvider implements vscode.TreeDataProvider<FissionEnvironment>{
   getTreeItem(element: FissionEnvironment): vscode.TreeItem {
@@ -19,11 +19,7 @@ export class FissionEnvironmentProvider implements vscode.TreeDataProvider<Fissi
   }
 
   async getFunction(): Promise<FissionEnvironment[]> {
-    let cfg = config();
-    if (cfg === null) {
-      return [];
-    }
-    const resp = await axios.get(cfg.UrlEnvironments);
+    const resp = await axios.get(config.get().UrlEnvironments);
     return resp.data?.map((element: { metadata: { name: string; }; }) => {
       return new FissionEnvironment(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
     });

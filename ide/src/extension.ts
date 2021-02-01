@@ -5,12 +5,9 @@ import * as vscode from 'vscode';
 import { FissionFunctionProvider, FissionFunction } from './functions';
 import { FissionPackageProvider } from './packages';
 import { FissionEnvironmentProvider } from './environments';
-
-import Delete from './commands/functions/delete';
-
+import Delete from './lib/functions/delete';
 import ViewDeploy from './view/functionDeploy/deploy';
-
-import config from "./commands/config";
+import config from "./lib/config";
 
 const FissionConfig = ".fission.json";
 

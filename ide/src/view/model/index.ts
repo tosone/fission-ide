@@ -1,5 +1,4 @@
 export interface IFunctionSpec {
-  path: string
   kind: string
   apiVersion: string
   metadata: {
@@ -57,6 +56,11 @@ export interface IFunctionSpec {
     concurrency: number
   }
 };
+
+export interface IFunction {
+  path: string
+  functionSpec: IFunctionSpec
+}
 
 export interface IPackageSpec {
   kind: string

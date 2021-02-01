@@ -1,15 +1,11 @@
 import * as vscode from 'vscode';
 
-export interface IConfigSpec {
-  UrlFunctions: string
-  UrlPackages: string
-  UrlEnvironments: string
-}
+import { IConfigSpec } from './model';
 
-const Config = (): IConfigSpec | null => {
+export default function get(): IConfigSpec {
   let server = vscode.workspace.getConfiguration("fission").get("server");
-  if (server == undefined || server == "") {
-    return null;
+  if (server == undefined) {
+    server = "http://127.0.0.1";
   }
   return {
     UrlFunctions: `${server}/v2/functions`,
@@ -17,5 +13,3 @@ const Config = (): IConfigSpec | null => {
     UrlEnvironments: `${server}/v2/environments`,
   }
 };
-
-export default Config;

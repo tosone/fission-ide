@@ -1,20 +1,19 @@
 import * as React from "react";
 
-
 import { Form, Input, Button, Select } from 'antd';
 
 import { CommandAction, IDeployCommand } from "../model";
-import { IFunctionSpec } from '../../model';
+import { IFunction } from '../../model';
 
 export enum DeployAction { Create, Update }
 
 interface IDeployProps {
   vscode: any;
-  initialData: IFunctionSpec;
+  ifunction: IFunction;
 }
 
 interface IDeployState {
-  functionSpec?: IFunctionSpec
+  ifunction?: IFunction
   deployAction: DeployAction
 }
 
@@ -22,13 +21,13 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
   constructor(props: any) {
     super(props);
 
-    let initialData = this.props.initialData;
+    let ifunction = this.props.ifunction;
     let vscode = this.props.vscode;
     if (vscode.getState()) {
       this.state = { ...vscode.getState() };
     } else {
       this.state = {
-        functionSpec: initialData,
+        ifunction: ifunction,
         deployAction: DeployAction.Create
       };
       vscode.setState({ ...this.state });
@@ -39,7 +38,7 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
   saveFunctionSpec = () => {
     let command: IDeployCommand = {
       action: CommandAction.Deploy,
-      content: this.state.functionSpec
+      content: this.state.ifunction
     };
     this.props.vscode.postMessage(command);
   }
@@ -69,18 +68,18 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           labelCol={{ span: 3 }}
           wrapperCol={{ span: 21 }}
           initialValues={{
-            path: this.state.functionSpec.path,
-            functionName: this.state.functionSpec.metadata.name,
-            entryPoint: this.state.functionSpec.spec.package.functionName,
-            packageName: this.state.functionSpec.spec.package.functionName,
-            executor: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType,
-            minCPU: parseInt(this.state.functionSpec.spec.resources.requests.cpu),
-            maxCPU: parseInt(this.state.functionSpec.spec.resources.limits.cpu),
-            minMem: parseInt(this.state.functionSpec.spec.resources.requests.memory),
-            maxMem: parseInt(this.state.functionSpec.spec.resources.limits.memory),
-            targetCPU: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent,
-            minReplica: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale,
-            maxReplica: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale,
+            path: this.state.ifunction.path,
+            functionName: this.state.ifunction.functionSpec.metadata.name,
+            entryPoint: this.state.ifunction.functionSpec.spec.package.functionName,
+            packageName: this.state.ifunction.functionSpec.spec.package.functionName,
+            executor: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType,
+            minCPU: parseInt(this.state.ifunction.functionSpec.spec.resources.requests.cpu),
+            maxCPU: parseInt(this.state.ifunction.functionSpec.spec.resources.limits.cpu),
+            minMem: parseInt(this.state.ifunction.functionSpec.spec.resources.requests.memory),
+            maxMem: parseInt(this.state.ifunction.functionSpec.spec.resources.limits.memory),
+            targetCPU: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent,
+            minReplica: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale,
+            maxReplica: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale,
           }}
         >
           <Form.Item
@@ -91,10 +90,10 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             <Input
               type="text"
               placeholder="Package Path"
-              value={this.state.functionSpec.path}
+              value={this.state.ifunction.path}
               readOnly
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.metadata.name = event.target.value;
+                this.state.ifunction.path = event.target.value;
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -109,14 +108,14 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             <Input
               type="text"
               placeholder="Function name"
-              value={this.state.functionSpec.metadata.name}
+              value={this.state.ifunction.functionSpec.metadata.name}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.metadata.name = event.target.value;
+                this.state.ifunction.functionSpec.metadata.name = event.target.value;
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
                 let command: IDeployCommand = {
                   action: CommandAction.NameTest,
-                  content: this.state.functionSpec
+                  content: this.state.ifunction
                 };
                 this.props.vscode.postMessage(command);
               }}
@@ -130,9 +129,9 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             <Input
               type="text"
               placeholder="Entry Point"
-              value={this.state.functionSpec.spec.package.functionName}
+              value={this.state.ifunction.functionSpec.spec.package.functionName}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.package.functionName = event.target.value;
+                this.state.ifunction.functionSpec.spec.package.functionName = event.target.value;
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -146,9 +145,9 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             <Input
               type="text"
               placeholder="Package name"
-              value={this.state.functionSpec.spec.package.functionName}
+              value={this.state.ifunction.functionSpec.spec.package.functionName}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.package.functionName = event.target.value;
+                this.state.ifunction.functionSpec.spec.package.functionName = event.target.value;
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -161,9 +160,9 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             extra="Executor type for execution; one of 'poolmgr', 'newdeploy'"
           >
             <Select
-              value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType}
+              value={this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType}
               onChange={(val: string) => {
-                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType = val;
+                this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType = val;
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -175,15 +174,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Min CPU"
             name="minCPU"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Minimum CPU to be assigned to pod (In millicore, minimum 1)"
           >
             <Input
               type="number"
-              value={parseInt(this.state.functionSpec.spec.resources.requests.cpu)}
+              value={parseInt(this.state.ifunction.functionSpec.spec.resources.requests.cpu)}
               placeholder="Min CPU"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.resources.requests.cpu = event.target.value + "m";
+                this.state.ifunction.functionSpec.spec.resources.requests.cpu = event.target.value + "m";
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -192,15 +191,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Max CPU"
             name="maxCPU"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Maximum CPU to be assigned to pod (In millicore, minimum 1)"
           >
             <Input
               type="number"
-              value={parseInt(this.state.functionSpec.spec.resources.limits.cpu)}
+              value={parseInt(this.state.ifunction.functionSpec.spec.resources.limits.cpu)}
               placeholder="Max CPU"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.resources.limits.cpu = event.target.value + "m";
+                this.state.ifunction.functionSpec.spec.resources.limits.cpu = event.target.value + "m";
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -209,15 +208,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Min Memory"
             name="minMem"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Minimum memory to be assigned to pod (In megabyte)"
           >
             <Input
               type="number"
-              value={parseInt(this.state.functionSpec.spec.resources.requests.memory)}
+              value={parseInt(this.state.ifunction.functionSpec.spec.resources.requests.memory)}
               placeholder="Min Memory"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.resources.requests.memory = event.target.value + "Mi";
+                this.state.ifunction.functionSpec.spec.resources.requests.memory = event.target.value + "Mi";
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -226,15 +225,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Max Memory"
             name="maxMem"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Maximum memory to be assigned to pod (In megabyte)"
           >
             <Input
               type="number"
-              value={parseInt(this.state.functionSpec.spec.resources.limits.memory)}
+              value={parseInt(this.state.ifunction.functionSpec.spec.resources.limits.memory)}
               placeholder="Max Memory"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.resources.limits.memory = event.target.value + "Mi";
+                this.state.ifunction.functionSpec.spec.resources.limits.memory = event.target.value + "Mi";
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -243,15 +242,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Target CPU"
             name="targetCPU"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Target average CPU usage percentage across pods for scaling (default: 80)"
           >
             <Input
               type="number"
-              value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
+              value={this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent}
               placeholder="Target CPU"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent = parseInt(event.target.value);
+                this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.TargetCPUPercent = parseInt(event.target.value);
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -260,15 +259,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Min Replica"
             name="minReplica"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Minimum number of pods (Uses resource inputs to configure HPA)"
           >
             <Input
               type="number"
-              value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
+              value={this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale}
               placeholder="Min Replica"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale = parseInt(event.target.value);
+                this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MinScale = parseInt(event.target.value);
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}
@@ -277,15 +276,15 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           <Form.Item
             label="Max Replica"
             name="maxReplica"
-            style={{ display: this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
+            style={{ display: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType == "poolmgr" ? "none" : "" }}
             extra="Maximum number of pods (Uses resource inputs to configure HPA)"
           >
             <Input
               type="number"
-              value={this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
+              value={this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale}
               placeholder="Max Replica"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                this.state.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale = parseInt(event.target.value);
+                this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.MaxScale = parseInt(event.target.value);
                 this.props.vscode.setState({ ...this.state });
                 this.setState({ ...this.state });
               }}

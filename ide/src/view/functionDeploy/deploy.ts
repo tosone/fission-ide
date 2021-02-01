@@ -5,9 +5,10 @@ import * as vscode from "vscode";
 import axios from 'axios';
 
 import { IDeployCommand, CommandAction } from "./model";
-import { IFunctionSpec } from "../model";
+import { IFunction } from "../model";
 import * as constants from '../constants';
-import config from "../../config";
+import config from "../../lib/config";
+import packages from "../../lib/packages";
 
 export default class ViewDeploy {
   private readonly panel: vscode.WebviewPanel | undefined;
@@ -15,14 +16,14 @@ export default class ViewDeploy {
 
   constructor(extensionPath: string, rootPath: string, configFile: string) {
     this.extensionPath = extensionPath;
-    let config: IFunctionSpec;
+    let ifunction: IFunction;
     if (!fs.existsSync(configFile)) {
-      config = defaultFunctionSpec;
+      ifunction = defaultFunction;
     } else {
       let content = fs.readFileSync(configFile, "utf8");
-      config = JSON.parse(content);
+      ifunction = JSON.parse(content);
     }
-    config.path = rootPath;
+    ifunction.path = rootPath;
     if (config) {
       this.panel = vscode.window.createWebviewPanel(
         "fissionView",
@@ -34,15 +35,15 @@ export default class ViewDeploy {
         }
       );
 
-      this.panel.webview.html = this.getWebviewContent(config);
+      this.panel.webview.html = this.getWebviewContent(ifunction);
 
       this.panel.webview.onDidReceiveMessage((command: IDeployCommand) => {
         switch (command.action) {
           case CommandAction.Deploy:
-            this.saveConfigFile(configFile, command.content);
+            this.deploy(configFile, command.content);
             break;
           case CommandAction.NameTest:
-            this.functionNameTest(command.content.metadata.name);
+            this.nameTest(command.content.functionSpec.metadata.name);
             break;
           default:
             vscode.window.showErrorMessage(`Function deploy cannot find command ${command.action}`);
@@ -51,29 +52,28 @@ export default class ViewDeploy {
     }
   }
 
-  private saveConfigFile(configFile: string, functionSpec: IFunctionSpec) {
-    let content: string = JSON.stringify(functionSpec);
+  private save(configFile: string, ifunction: IFunction) {
+    let content: string = JSON.stringify(ifunction);
     fs.writeFileSync(configFile, content);
   }
 
-  private functionNameTest(name: string) {
-    console.log(name);
+  private deploy(configFile: string, ifunction: IFunction) {
+    this.save(configFile, ifunction);
+    packages.create(ifunction);
+  }
+
+  private nameTest(name: string) {
     let newCommand: IDeployCommand;
-    let cfg = config();
-    if (cfg === null) {
-      vscode.window.showErrorMessage(`Connect server with error, please set the fission server address`);
-      return;
-    }
-    axios.get(cfg.UrlFunctions + "/" + name).then((resp) => {
+    axios.get(config.get().UrlFunctions + "/" + name).then((resp) => {
       if (resp.status !== 200) {
         newCommand = {
           action: CommandAction.NameNotExist,
-          content: defaultFunctionSpec
+          content: defaultFunction
         };
       } else {
         newCommand = {
           action: CommandAction.NameExist,
-          content: defaultFunctionSpec
+          content: defaultFunction
         };
       }
       this.panel?.webview.postMessage(newCommand);
@@ -81,13 +81,13 @@ export default class ViewDeploy {
       console.error(`Function deploy search function '${name}' catch err: ${err.response.status}`)
       newCommand = {
         action: CommandAction.NameNotExist,
-        content: defaultFunctionSpec
+        content: defaultFunction
       };
       this.panel?.webview.postMessage(newCommand);
     })
   }
 
-  private getWebviewContent(config: IFunctionSpec): string {
+  private getWebviewContent(config: IFunction): string {
     const reactAppPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, "view", "deploy.js"));
     const reactAppUri = reactAppPathOnDisk.with({ scheme: "vscode-resource" });
 
@@ -98,49 +98,51 @@ export default class ViewDeploy {
   }
 }
 
-const defaultFunctionSpec: IFunctionSpec = {
+const defaultFunction: IFunction = {
   path: "",
-  kind: "Function",
-  apiVersion: "fission.io/v1",
-  metadata: {
-    name: "tosone",
-    namespace: "default"
-  },
-  spec: {
-    environment: {
-      namespace: "default",
-      name: ""
+  functionSpec: {
+    kind: "Function",
+    apiVersion: "fission.io/v1",
+    metadata: {
+      name: "tosone",
+      namespace: "default"
     },
-    package: {
-      packageref: {
-        name: "",
+    spec: {
+      environment: {
         namespace: "default",
-        resourceversion: ""
+        name: ""
       },
-      functionName: ""
-    },
-    resources: {
-      limits: {
-        cpu: "120m",
-        memory: "100Mi"
+      package: {
+        packageref: {
+          name: "",
+          namespace: "default",
+          resourceversion: ""
+        },
+        functionName: ""
       },
-      requests: {
-        cpu: "80m",
-        memory: "50Mi"
-      }
-    },
-    InvokeStrategy: {
-      ExecutionStrategy: {
-        ExecutorType: "poolmgr",
-        MinScale: 2,
-        MaxScale: 2,
-        TargetCPUPercent: 80,
-        SpecializationTimeout: 120
+      resources: {
+        limits: {
+          cpu: "120m",
+          memory: "100Mi"
+        },
+        requests: {
+          cpu: "80m",
+          memory: "50Mi"
+        }
       },
-      StrategyType: "execution"
-    },
-    functionTimeout: 60,
-    idletimeout: 120,
-    concurrency: 5
+      InvokeStrategy: {
+        ExecutionStrategy: {
+          ExecutorType: "poolmgr",
+          MinScale: 2,
+          MaxScale: 2,
+          TargetCPUPercent: 80,
+          SpecializationTimeout: 120
+        },
+        StrategyType: "execution"
+      },
+      functionTimeout: 60,
+      idletimeout: 120,
+      concurrency: 5
+    }
   }
 }

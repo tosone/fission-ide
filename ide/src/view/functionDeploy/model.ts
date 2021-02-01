@@ -1,8 +1,8 @@
-import { IFunctionSpec } from "../model";
+import { IFunction } from "../model";
 
 export interface IDeployCommand {
   action: CommandAction;
-  content: IFunctionSpec;
+  content: IFunction;
 }
 
 export enum CommandAction { Deploy, NameTest, NameExist, NameNotExist }

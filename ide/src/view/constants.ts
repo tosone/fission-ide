@@ -1,14 +1,14 @@
 import * as vscode from "vscode";
 
-import { IFunctionSpec } from "./model";
+import { IFunction } from "./model";
 
-const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
+const tmpl = (ifunction: IFunction, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
   return `<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Config View</title>
+        <title>Fission Function Deploy</title>
 
         <meta http-equiv="Content-Security-Policy"
                     content="default-src 'none';
@@ -17,7 +17,7 @@ const tmpl = (config: IFunctionSpec, bundleUri: vscode.Uri, reactAppUri: vscode.
                              style-src vscode-resource: 'unsafe-inline';">
         <script>
           window.acquireVsCodeApi = acquireVsCodeApi;
-          window.initialData = ${JSON.stringify(config)};
+          window.ifunction = ${JSON.stringify(ifunction)};
         </script>
     </head>
     <body>
