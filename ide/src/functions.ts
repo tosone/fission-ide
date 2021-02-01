@@ -26,7 +26,11 @@ export class FissionFunctionProvider implements vscode.TreeDataProvider<FissionF
   }
 
   async getFunction(): Promise<FissionFunction[]> {
-    const resp = await axios.get(config().UrlFunctions);
+    let cfg = config();
+    if (cfg === null) {
+      return [];
+    }
+    const resp = await axios.get(cfg.UrlFunctions);
     return resp.data?.map((element: { metadata: { name: string; }; }) => {
       return new FissionFunction(element?.metadata?.name,
         "nodejs",

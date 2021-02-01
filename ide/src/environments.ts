@@ -19,7 +19,11 @@ export class FissionEnvironmentProvider implements vscode.TreeDataProvider<Fissi
   }
 
   async getFunction(): Promise<FissionEnvironment[]> {
-    const resp = await axios.get(config().UrlEnvironments);
+    let cfg = config();
+    if (cfg === null) {
+      return [];
+    }
+    const resp = await axios.get(cfg.UrlEnvironments);
     return resp.data?.map((element: { metadata: { name: string; }; }) => {
       return new FissionEnvironment(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
     });

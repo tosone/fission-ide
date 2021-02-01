@@ -76,6 +76,10 @@
         "title": "Test function"
       },
       {
+        "command": "fission-ide.config.update",
+        "title": "Fission config update"
+      },
+      {
         "command": "fission-ide.function.refresh",
         "title": "Refresh",
         "icon": {

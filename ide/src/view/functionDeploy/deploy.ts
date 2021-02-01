@@ -59,7 +59,12 @@ export default class ViewDeploy {
   private functionNameTest(name: string) {
     console.log(name);
     let newCommand: IDeployCommand;
-    axios.get(config().UrlFunctions + "/" + name).then((resp) => {
+    let cfg = config();
+    if (cfg === null) {
+      vscode.window.showErrorMessage(`Connect server with error, please set the fission server address`);
+      return;
+    }
+    axios.get(cfg.UrlFunctions + "/" + name).then((resp) => {
       if (resp.status !== 200) {
         newCommand = {
           action: CommandAction.NameNotExist,

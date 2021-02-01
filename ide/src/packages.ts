@@ -19,7 +19,11 @@ export class FissionPackageProvider implements vscode.TreeDataProvider<FissionPa
   }
 
   async getFunction(): Promise<FissionPackage[]> {
-    const resp = await axios.get(config().UrlPackages);
+    let cfg = config();
+    if (cfg === null) {
+      return [];
+    }
+    const resp = await axios.get(cfg.UrlPackages);
     return resp.data?.map((element: { metadata: { name: string; }; }) => {
       return new FissionPackage(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
     });

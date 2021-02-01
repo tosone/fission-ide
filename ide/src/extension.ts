@@ -10,6 +10,8 @@ import Delete from './commands/functions/delete';
 
 import ViewDeploy from './view/functionDeploy/deploy';
 
+import config from "./commands/config";
+
 const FissionConfig = ".fission.json";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -29,7 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   let DeployCommand = "fission-ide.deploy";
   context.subscriptions.push(vscode.commands.registerCommand(DeployCommand, (uri: vscode.Uri) => {
-    console.log(vscode.workspace.getConfiguration("fission").get("server"));
     if (uri == undefined) {
       if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
         let rootFolder = vscode.workspace.workspaceFolders[0];
@@ -43,7 +44,31 @@ export function activate(context: vscode.ExtensionContext) {
       let config = path.join(rootFolder, FissionConfig);
       new ViewDeploy(context.extensionPath, uri.fsPath, config);
     }
-  }))
+  }));
+
+  let ConfigUpdateCommand = "fission-ide.config.update";
+  context.subscriptions.push(vscode.commands.registerCommand(ConfigUpdateCommand, () => {
+    let options: vscode.InputBoxOptions = {
+      prompt: "Fission controller server address"
+    };
+    vscode.window.showInputBox(options).then((val: string | undefined) => {
+      if (val == undefined) {
+        return;
+      }
+      if (val === "") {
+        vscode.window.showErrorMessage("Invalid server address");
+        return;
+      }
+      config.test(val).then(avaliable => {
+        if (!avaliable) {
+          vscode.window.showErrorMessage("Cannot connect the fission server, please check");
+        } else {
+          config.update(val);
+          vscode.window.showInformationMessage("Server address has been set");
+        }
+      })
+    });
+  }));
 
   let deployStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
   deployStatusBarItem.command = DeployCommand;
