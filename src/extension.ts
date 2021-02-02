@@ -2,40 +2,38 @@ import * as path from 'path';
 
 import * as vscode from 'vscode';
 
-import { FissionFunctionProvider, FissionFunction } from './functions';
-import { FissionPackageProvider } from './packages';
-import { FissionEnvironmentProvider } from './environments';
-import functions from './lib/functions';
-import ViewDeploy from './view/functionDeploy/deploy';
 import config from "./lib/config";
 import packages from './lib/packages';
+import functions from './lib/functions';
 import environents from './lib/environents';
+
+import ViewDeploy from './view/functionDeploy/deploy';
 
 const FissionConfig = ".fission.json";
 
 export function activate(context: vscode.ExtensionContext) {
-  const fissionFunctionProvider = new FissionFunctionProvider();
-  vscode.window.registerTreeDataProvider('fission-function', fissionFunctionProvider);
+  const functionProvider = new functions.FunctionProvider();
+  vscode.window.registerTreeDataProvider('fission-function', functionProvider);
 
-  const fissionPackageProvider = new FissionPackageProvider();
-  vscode.window.registerTreeDataProvider('fission-package', fissionPackageProvider);
+  const packageProvider = new packages.PackageProvider();
+  vscode.window.registerTreeDataProvider('fission-package', packageProvider);
 
-  const fissionEnvironmentProvider = new FissionEnvironmentProvider();
-  vscode.window.registerTreeDataProvider('fission-environment', fissionEnvironmentProvider);
+  const environmentProvider = new environents.EnvironmentProvider();
+  vscode.window.registerTreeDataProvider('fission-environment', environmentProvider);
 
-  vscode.commands.registerCommand('fission-ide.function.delete', (node: FissionFunction) => {
+  vscode.commands.registerCommand('fission-ide.function.delete', (node: any) => {
     functions.del(node.label);
-    fissionFunctionProvider.refresh();
+    functionProvider.refresh();
   });
 
-  vscode.commands.registerCommand('fission-ide.package.delete', (node: FissionFunction) => {
+  vscode.commands.registerCommand('fission-ide.package.delete', (node: any) => {
     packages.del(node.label);
-    fissionPackageProvider.refresh();
+    packageProvider.refresh();
   });
 
-  vscode.commands.registerCommand('fission-ide.environment.delete', (node: FissionFunction) => {
+  vscode.commands.registerCommand('fission-ide.environment.delete', (node: any) => {
     environents.del(node.label);
-    fissionEnvironmentProvider.refresh();
+    environmentProvider.refresh();
   });
 
   let DeployCommand = "fission-ide.function.deploy";
@@ -81,15 +79,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   let FunctionRefreshCommand = "fission-ide.function.refresh";
   context.subscriptions.push(vscode.commands.registerCommand(FunctionRefreshCommand, () => {
-    fissionFunctionProvider.refresh();
+    functionProvider.refresh();
   }));
   let PackageRefreshCommand = "fission-ide.package.refresh";
   context.subscriptions.push(vscode.commands.registerCommand(PackageRefreshCommand, () => {
-    fissionPackageProvider.refresh();
+    packageProvider.refresh();
   }));
   let EnvironmentRefreshCommand = "fission-ide.environment.refresh";
   context.subscriptions.push(vscode.commands.registerCommand(EnvironmentRefreshCommand, () => {
-    fissionEnvironmentProvider.refresh();
+    environmentProvider.refresh();
   }));
 
   // TODO: function dir deploy

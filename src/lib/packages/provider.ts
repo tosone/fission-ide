@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import axios from 'axios';
 
-import config from "./lib/config";
+import config from "../config";
 
-export class FissionPackageProvider implements vscode.TreeDataProvider<FissionPackage>{
+export class PackageProvider implements vscode.TreeDataProvider<FissionPackage>{
   private _onDidChangeTreeData: vscode.EventEmitter<FissionPackage | undefined | void> = new vscode.EventEmitter<FissionPackage | undefined | void>();
   readonly onDidChangeTreeData: vscode.Event<FissionPackage | undefined | void> = this._onDidChangeTreeData.event;
 
