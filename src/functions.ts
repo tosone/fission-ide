@@ -54,5 +54,5 @@ export class FissionFunction extends vscode.TreeItem {
 
   iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');
 
-  contextValue = 'dependency';
+  contextValue = 'functions';
 }

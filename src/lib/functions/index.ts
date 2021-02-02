@@ -1,3 +1,4 @@
 import deploy from "./deploy";
+import del from "./del";
 
-export default { deploy };
+export default { deploy, del };

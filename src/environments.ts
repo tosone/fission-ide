@@ -6,6 +6,13 @@ import axios from 'axios';
 import config from "./lib/config";
 
 export class FissionEnvironmentProvider implements vscode.TreeDataProvider<FissionEnvironment>{
+  private _onDidChangeTreeData: vscode.EventEmitter<FissionEnvironment | undefined | void> = new vscode.EventEmitter<FissionEnvironment | undefined | void>();
+  readonly onDidChangeTreeData: vscode.Event<FissionEnvironment | undefined | void> = this._onDidChangeTreeData.event;
+
+  refresh(): void {
+    this._onDidChangeTreeData.fire();
+  }
+
   getTreeItem(element: FissionEnvironment): vscode.TreeItem {
     return element;
   }
@@ -39,5 +46,5 @@ export class FissionEnvironment extends vscode.TreeItem {
 
   iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');
 
-  contextValue = 'dependency';
+  contextValue = 'environments';
 }

@@ -64,7 +64,7 @@ export default class ViewDeploy {
   private deploy(configFile: string, ifunction: IFunction, commandAction: CommandAction) {
     this.save(configFile, ifunction);
     packages.create(ifunction).then(ipackage => {
-      // TODO: env setting
+      // TODO: env setting.
       ifunction.functionSpec.spec.environment.name = "nodejs";
       ifunction.functionSpec.spec.package.packageref.name = ipackage.packageSpec.metadata.name;
       return functions.deploy(ifunction, commandAction);
@@ -77,7 +77,8 @@ export default class ViewDeploy {
         } else if (commandAction == CommandAction.Update) {
           vscode.window.showInformationMessage(`Update function "${ifunction.functionSpec.metadata.name}" success`);
         }
-        // TODO: open the test page
+        // TODO: After create function should change the button to 'update', but cannot get the 'resourceVersion' from resp.
+        // TODO: open the test page.
       }
     });
   }
@@ -91,7 +92,6 @@ export default class ViewDeploy {
           content: defaultFunction
         };
       } else {
-        console.log(resp.data);
         let data: IFunction = {
           path: "",
           functionSpec: resp.data
@@ -103,7 +103,6 @@ export default class ViewDeploy {
       }
       this.panel?.webview.postMessage(newCommand);
     }).catch(err => {
-      console.error(`Function deploy search function '${name}' catch err: ${err.response.status}`)
       newCommand = {
         action: CommandAction.NameNotExist,
         content: defaultFunction

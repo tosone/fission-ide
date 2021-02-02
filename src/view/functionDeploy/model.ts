@@ -5,4 +5,4 @@ export interface IDeployCommand {
   content: IFunction;
 }
 
-export enum CommandAction { Create, Update, Deploy, NameTest, NameExist, NameNotExist }
+export enum CommandAction { Create, Update, NameTest, NameExist, NameNotExist }

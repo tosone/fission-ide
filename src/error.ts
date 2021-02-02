@@ -7,5 +7,5 @@ export default {
   },
   ErrorFileNotExist: { "name": "NotExist", "message": "No such a file or director： %s" },
   ErrorUnknown: { "name": "Unknown", "message": "Unknown error: %s" },
-  ErrorServer: { "name": "Server", "message": "Server error: %o" }
+  ErrorServer: { "name": "Server", "message": "Server error: %s" }
 }

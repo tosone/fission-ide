@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 import config from '../config';
 
-async function Delete(label: string | vscode.TreeItemLabel | undefined) {
+async function del(label: string | vscode.TreeItemLabel | undefined) {
   if (label == undefined) {
     return Promise.resolve([]);
   }
@@ -16,4 +16,4 @@ async function Delete(label: string | vscode.TreeItemLabel | undefined) {
   }
 }
 
-export default Delete;
+export default del;

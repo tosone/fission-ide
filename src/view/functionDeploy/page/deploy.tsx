@@ -51,10 +51,6 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
       const command: IDeployCommand = event.data;
       switch (command.action) {
         case CommandAction.NameExist:
-          console.log(command);
-          console.log(command.content.functionSpec.metadata.resourceVersion);
-          console.log(this.state.ifunction.functionSpec.metadata.resourceVersion);
-
           this.state.ifunction.functionSpec.metadata.resourceVersion = command.content.functionSpec.metadata.resourceVersion;
           this.setState({ ...this.state });
           this.setState({ deployAction: CommandAction.Update }); // TODO: useState
