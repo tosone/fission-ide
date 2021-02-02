@@ -5,10 +5,11 @@ import * as vscode from "vscode";
 import axios from 'axios';
 
 import { IDeployCommand, CommandAction } from "./model";
-import { IFunction } from "../model";
+import { IFunction } from "../../lib/functions/model";
 import * as constants from '../constants';
 import config from "../../lib/config";
 import packages from "../../lib/packages";
+import functions from "../../lib/functions";
 
 export default class ViewDeploy {
   private readonly panel: vscode.WebviewPanel | undefined;
@@ -39,8 +40,11 @@ export default class ViewDeploy {
 
       this.panel.webview.onDidReceiveMessage((command: IDeployCommand) => {
         switch (command.action) {
-          case CommandAction.Deploy:
-            this.deploy(configFile, command.content);
+          case CommandAction.Create:
+            this.deploy(configFile, command.content, CommandAction.Create);
+            break;
+          case CommandAction.Update:
+            this.deploy(configFile, command.content, CommandAction.Update);
             break;
           case CommandAction.NameTest:
             this.nameTest(command.content.functionSpec.metadata.name);
@@ -57,9 +61,25 @@ export default class ViewDeploy {
     fs.writeFileSync(configFile, content);
   }
 
-  private deploy(configFile: string, ifunction: IFunction) {
+  private deploy(configFile: string, ifunction: IFunction, commandAction: CommandAction) {
     this.save(configFile, ifunction);
-    packages.create(ifunction);
+    packages.create(ifunction).then(ipackage => {
+      // TODO: env setting
+      ifunction.functionSpec.spec.environment.name = "nodejs";
+      ifunction.functionSpec.spec.package.packageref.name = ipackage.packageSpec.metadata.name;
+      return functions.deploy(ifunction, commandAction);
+    }).then((ifunction) => {
+      if (ifunction.error !== undefined) {
+        vscode.window.showErrorMessage(`Create function with error: ${ifunction.error.message}`);
+      } else {
+        if (commandAction == CommandAction.Create) {
+          vscode.window.showInformationMessage(`Create function "${ifunction.functionSpec.metadata.name}" success`);
+        } else if (commandAction == CommandAction.Update) {
+          vscode.window.showInformationMessage(`Update function "${ifunction.functionSpec.metadata.name}" success`);
+        }
+        // TODO: open the test page
+      }
+    });
   }
 
   private nameTest(name: string) {
@@ -71,9 +91,14 @@ export default class ViewDeploy {
           content: defaultFunction
         };
       } else {
+        console.log(resp.data);
+        let data: IFunction = {
+          path: "",
+          functionSpec: resp.data
+        };
         newCommand = {
           action: CommandAction.NameExist,
-          content: defaultFunction
+          content: data
         };
       }
       this.panel?.webview.postMessage(newCommand);

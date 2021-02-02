@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IPackage } from "./model";
 import config from "../config";
 import error from "../../error";
-import { IFunction } from "../../view/model";
+import { IFunction } from "../functions/model";
 
 export default async function create(ifunction: IFunction): Promise<IPackage> {
   let ipackage: IPackage = {
@@ -36,7 +36,6 @@ export default async function create(ifunction: IFunction): Promise<IPackage> {
     return ipackage;
   }
   ipackage.packageSpec.spec.deployment.literal = fs.readFileSync(ifunction.path, { encoding: "base64" });
-  console.log(ipackage.packageSpec.spec.deployment.literal);
   ipackage.packageSpec.metadata.name = ifunction.functionSpec.metadata.name + "-" + uuidv4();
   let fileStat = fs.statSync(ifunction.path);
   if (fileStat.isDirectory()) {
@@ -44,7 +43,7 @@ export default async function create(ifunction: IFunction): Promise<IPackage> {
   } else if (fileStat.isFile()) {
     try {
       let axiosRequestConfig: AxiosRequestConfig = {
-        method: 'post',
+        method: 'POST',
         url: config.get().UrlPackages,
         headers: {
           'Content-Type': 'application/json'
@@ -65,5 +64,3 @@ export default async function create(ifunction: IFunction): Promise<IPackage> {
   }
   return ipackage;
 }
-
-

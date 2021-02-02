@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { IFunction } from "./model";
+import { IFunction } from "../lib/functions/model";
 
 const tmpl = (ifunction: IFunction, bundleUri: vscode.Uri, reactAppUri: vscode.Uri) => {
   return `<!DOCTYPE html>

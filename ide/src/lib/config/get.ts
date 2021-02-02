@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { IConfigSpec } from './model';
 
+// TODO: check fission.server suffix with '/'
 export default function get(): IConfigSpec {
   let server = vscode.workspace.getConfiguration("fission").get("server");
   if (server == undefined) {

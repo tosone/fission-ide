@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import Deploy from "./deploy";
-import { IFunction } from "../../model";
+import { IFunction } from "../../../lib/functions/model";
 
 import "../../index.scss";
 

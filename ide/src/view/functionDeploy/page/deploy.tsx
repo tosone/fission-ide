@@ -3,9 +3,7 @@ import * as React from "react";
 import { Form, Input, Button, Select } from 'antd';
 
 import { CommandAction, IDeployCommand } from "../model";
-import { IFunction } from '../../model';
-
-export enum DeployAction { Create, Update }
+import { IFunction } from '../../../lib/functions/model';
 
 interface IDeployProps {
   vscode: any;
@@ -14,7 +12,7 @@ interface IDeployProps {
 
 interface IDeployState {
   ifunction?: IFunction
-  deployAction: DeployAction
+  deployAction: CommandAction
 }
 
 export default class Deploy extends React.Component<IDeployProps, IDeployState> {
@@ -28,16 +26,21 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
     } else {
       this.state = {
         ifunction: ifunction,
-        deployAction: DeployAction.Create
+        deployAction: CommandAction.Create
       };
       vscode.setState({ ...this.state });
     }
     this.listen();
+    let command: IDeployCommand = {
+      action: CommandAction.NameTest,
+      content: this.state.ifunction
+    };
+    this.props.vscode.postMessage(command);
   }
 
-  saveFunctionSpec = () => {
+  functionDeploy = () => {
     let command: IDeployCommand = {
-      action: CommandAction.Deploy,
+      action: this.state.deployAction,
       content: this.state.ifunction
     };
     this.props.vscode.postMessage(command);
@@ -48,10 +51,17 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
       const command: IDeployCommand = event.data;
       switch (command.action) {
         case CommandAction.NameExist:
-          this.setState({ deployAction: DeployAction.Update });
+          console.log(command);
+          console.log(command.content.functionSpec.metadata.resourceVersion);
+          console.log(this.state.ifunction.functionSpec.metadata.resourceVersion);
+
+          this.state.ifunction.functionSpec.metadata.resourceVersion = command.content.functionSpec.metadata.resourceVersion;
+          this.setState({ ...this.state });
+          this.setState({ deployAction: CommandAction.Update }); // TODO: useState
           break;
         case CommandAction.NameNotExist:
-          this.setState({ deployAction: DeployAction.Create });
+          this.state.ifunction.functionSpec.metadata.resourceVersion = "";
+          this.setState({ deployAction: CommandAction.Create });
           break;
         default:
           console.error(`Function deploy cannot find command ${command.action}`);
@@ -291,8 +301,8 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
             />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 3, span: 21 }}>
-            <Button type="primary" onClick={this.saveFunctionSpec}>{
-              this.state.deployAction === DeployAction.Create ? "Create" : "Update"
+            <Button type="primary" onClick={this.functionDeploy}>{
+              this.state.deployAction === CommandAction.Create ? "Create" : "Update"
             }</Button>
           </Form.Item>
         </Form>
