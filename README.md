@@ -15,23 +15,24 @@ Previously, when we created the Fission function, we had to publish it through f
 
 First of all, you must set up the corresponding API server for Fission, which is the address of the Fission controller exposed outside the Kubernetes cluster, and do not end with a '/'.
 
-![setting](./doc/images/setting.png)
+<img src="./doc/images/setting.png" alt="setting" height="200px">
 
 ### Manage Fission Resource
 
 You can manage Function, Environment and Package in VSCode SideBar.
 
-![sidebar](./doc/images/sidebar.png)
+<img src="./doc/images/sidebar.png" alt="sidebar" height="600px">
 
 ### Deploy Function
 
 Deploy Function by context menu in the file edit area and select 'Fission Function Deploy'. You can also deploy Function from the context menu in the file browsing area.
 
+<img src="./doc/images/deploy-file-1.png" alt="deploy-file" height="500px">
+<img src="./doc/images/deploy-file-2.png" alt="deploy-file" height="500px">
+
 Although you can see a new button on the VSCode status-bar, its function will be to deploy the folder to Fission, but this feature is not yet supported.
 
-|Deploy file|Deploy file|Deploy dir|
-|:---:|:---:|:---:|
-|![deploy-file-1](./doc/images/deploy-file-1.png)|![deploy-file-2](./doc/images/deploy-file-2.png)|![deploy-dir.png](./doc/images/deploy-dir.png)|
+<img src="./doc/images/deploy-dir.png" alt="deploy-file" height="500px">
 
 After that you can deploy the function!
 
