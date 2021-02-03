@@ -21,6 +21,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Resolve the dependencies
-        run: cd ide && yarn install
+        run: yarn install
       - name: Build the vscode ide
-        run: cd ide && yarn run package
+        run: yarn run package
