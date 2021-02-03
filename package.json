@@ -2,7 +2,7 @@
   "name": "fission-ide",
   "displayName": "fission-ide",
   "description": "Fission IDE",
-  "publisher": "Tosone",
+  "publisher": "fission-ide",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.52.0"
