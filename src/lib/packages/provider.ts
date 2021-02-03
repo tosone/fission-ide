@@ -1,9 +1,10 @@
 import * as path from 'path';
 
-import * as vscode from 'vscode';
 import axios from 'axios';
+import * as vscode from 'vscode';
 
 import config from "../config";
+import { IPackageSpec } from './model';
 
 export class PackageProvider implements vscode.TreeDataProvider<FissionPackage>{
   private _onDidChangeTreeData: vscode.EventEmitter<FissionPackage | undefined | void> = new vscode.EventEmitter<FissionPackage | undefined | void>();
@@ -27,21 +28,20 @@ export class PackageProvider implements vscode.TreeDataProvider<FissionPackage>{
 
   async getFunction(): Promise<FissionPackage[]> {
     const resp = await axios.get(config.get().UrlPackages);
-    return resp.data?.map((element: { metadata: { name: string; }; }) => {
-      return new FissionPackage(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
-    });
+    if (resp.status !== 200) {
+      return [];
+    } else {
+      return resp.data.map((element: IPackageSpec) => {
+        return new FissionPackage(element.metadata.name);
+      });
+    }
   }
 }
 
 export class FissionPackage extends vscode.TreeItem {
-  constructor(
-    public readonly name: string,
-    private readonly version: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState
-  ) {
-    super(name, collapsibleState);
-    this.tooltip = `${this.name}-${this.version}`;
-    this.description = this.name;
+  constructor(public readonly label: string) {
+    super(label);
+    this.tooltip = this.label;
   }
 
   iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');

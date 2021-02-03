@@ -1,9 +1,10 @@
 import * as path from 'path';
 
-import * as vscode from 'vscode';
 import axios from 'axios';
+import * as vscode from 'vscode';
 
 import config from "../config";
+import { IEnvironmentSpec } from './model';
 
 export class EnvironmentProvider implements vscode.TreeDataProvider<FissionEnvironment>{
   private _onDidChangeTreeData: vscode.EventEmitter<FissionEnvironment | undefined | void> = new vscode.EventEmitter<FissionEnvironment | undefined | void>();
@@ -27,21 +28,20 @@ export class EnvironmentProvider implements vscode.TreeDataProvider<FissionEnvir
 
   async getFunction(): Promise<FissionEnvironment[]> {
     const resp = await axios.get(config.get().UrlEnvironments);
-    return resp.data?.map((element: { metadata: { name: string; }; }) => {
-      return new FissionEnvironment(element?.metadata?.name, "nodejs", vscode.TreeItemCollapsibleState.None);
-    });
+    if (resp.status !== 200) {
+      return [];
+    } else {
+      return resp.data.map((element: IEnvironmentSpec) => {
+        return new FissionEnvironment(element.metadata.name);
+      });
+    }
   }
 }
 
 export class FissionEnvironment extends vscode.TreeItem {
-  constructor(
-    public readonly name: string,
-    private readonly version: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState
-  ) {
-    super(name, collapsibleState);
-    this.tooltip = `${this.name}-${this.version}`;
-    this.description = this.name;
+  constructor(public readonly label: string) {
+    super(label);
+    this.tooltip = this.label;
   }
 
   iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');

@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as vscode from 'vscode';
 
 import config from "../config";
+import { IFunctionSpec } from './model';
 
 export class FunctionProvider implements vscode.TreeDataProvider<FissionFunction>{
   private _onDidChangeTreeData: vscode.EventEmitter<FissionFunction | undefined | void> = new vscode.EventEmitter<FissionFunction | undefined | void>();
@@ -27,29 +28,21 @@ export class FunctionProvider implements vscode.TreeDataProvider<FissionFunction
 
   async getFunction(): Promise<FissionFunction[]> {
     const resp = await axios.get(config.get().UrlFunctions);
-    return resp.data?.map((element: { metadata: { name: string; }; }) => {
-      return new FissionFunction(element?.metadata?.name,
-        "nodejs",
-        vscode.TreeItemCollapsibleState.None,
-        {
-          command: 'extension.openPackageOnNpm',
-          title: 'ssss',
-          arguments: []
-        });
-    });
+    if (resp.status !== 200) {
+      return [];
+    } else {
+      return resp.data.map((element: IFunctionSpec) => {
+        return new FissionFunction(element.metadata.name, element.spec.environment.name);
+      });
+    }
   }
 }
 
 export class FissionFunction extends vscode.TreeItem {
-  constructor(
-    public readonly name: string,
-    private readonly version: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly command?: vscode.Command
-  ) {
-    super(name, collapsibleState);
-    this.tooltip = `${this.name}-${this.version}`;
-    this.description = this.name;
+  constructor(public readonly label: string, private readonly language: string) {
+    super(label);
+    this.tooltip = this.label;
+    this.description = this.language;
   }
 
   iconPath = path.join(__filename, '..', '..', 'resources', 'dependency.svg');
