@@ -27,16 +27,19 @@ You can manage Function, Environment and Package in VSCode SideBar.
 
 Deploy Function by context menu in the file edit area and select 'Fission Function Deploy'. You can also deploy Function from the context menu in the file browsing area.
 
-![deploy-file-1](./doc/images/deploy-file-1.png)
-![deploy-file-2](./doc/images/deploy-file-2.png)
-
 Although you can see a new button on the VSCode status-bar, its function will be to deploy the folder to Fission, but this feature is not yet supported.
 
-![deploy-dir.png](./doc/images/deploy-dir.png)
+|Deploy file|Deploy file|Deploy dir|
+|:---:|:---:|:---:|
+|![deploy-file-1](./doc/images/deploy-file-1.png)|![deploy-file-2](./doc/images/deploy-file-2.png)|![deploy-dir.png](./doc/images/deploy-dir.png)|
 
 After that you can deploy the function!
 
 ![deploy](./doc/images/deploy.png)
+
+Finally, a file will be generated that contains all the information of the current deployment, which is called `.fission.json`, the configuration in this file will be read again when the next deployment.
+
+![config](./doc/images/config.png)
 
 ## TODO
 
