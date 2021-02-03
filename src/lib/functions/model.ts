@@ -60,5 +60,6 @@ export interface IFunctionSpec {
 export interface IFunction {
   path: string;
   error?: Error;
+  env?: string[];
   functionSpec: IFunctionSpec;
 };

@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 import config from '../config';
 
-async function del(label: string | vscode.TreeItemLabel | undefined) {
+export default async function del(label: string | vscode.TreeItemLabel | undefined) {
   if (label == undefined) {
     return Promise.resolve([]);
   }
@@ -14,6 +14,4 @@ async function del(label: string | vscode.TreeItemLabel | undefined) {
   } else {
     vscode.window.showErrorMessage(`Delete environment ${environmentName} with status code ${resp.status}, body: ${resp.data}`);
   }
-}
-
-export default del;
+};

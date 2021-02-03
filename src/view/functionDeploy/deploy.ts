@@ -4,12 +4,13 @@ import * as path from "path";
 import * as vscode from "vscode";
 import axios from 'axios';
 
-import { IDeployCommand, CommandAction } from "./model";
-import { IFunction } from "../../lib/functions/model";
-import * as constants from '../constants';
 import config from "../../lib/config";
 import packages from "../../lib/packages";
+import * as constants from '../constants';
 import functions from "../../lib/functions";
+import { IFunction } from "../../lib/functions/model";
+import { IDeployCommand, CommandAction } from "./model";
+import environents from "../../lib/environents";
 
 export default class ViewDeploy {
   private readonly panel: vscode.WebviewPanel | undefined;
@@ -18,6 +19,7 @@ export default class ViewDeploy {
   constructor(extensionPath: string, rootPath: string, configFile: string) {
     this.extensionPath = extensionPath;
     let ifunction: IFunction;
+    // search the '.fission.json' file and create panel
     if (!fs.existsSync(configFile)) {
       ifunction = defaultFunction;
     } else {
@@ -36,6 +38,15 @@ export default class ViewDeploy {
         }
       );
 
+      let panel = this.panel;
+      environents.get().then(envs => {
+        let envNames: string[] = [];
+        envs.forEach(env => {
+          envNames.push(env.metadata.name);
+        });
+        ifunction.env = envNames;
+        panel.webview.html = this.getWebviewContent(ifunction);
+      });
       this.panel.webview.html = this.getWebviewContent(ifunction);
 
       this.panel.webview.onDidReceiveMessage((command: IDeployCommand) => {
@@ -111,14 +122,14 @@ export default class ViewDeploy {
     })
   }
 
-  private getWebviewContent(config: IFunction): string {
+  private getWebviewContent(ifunction: IFunction): string {
     const reactAppPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, "view", "deploy.js"));
     const reactAppUri = reactAppPathOnDisk.with({ scheme: "vscode-resource" });
 
     const bundleOnDisk = vscode.Uri.file(path.join(this.extensionPath, "view", "bundle.js"));
     const bundleUri = bundleOnDisk.with({ scheme: "vscode-resource" });
 
-    return constants.tmpl(config, bundleUri, reactAppUri);
+    return constants.tmpl(ifunction, bundleUri, reactAppUri);
   }
 }
 
