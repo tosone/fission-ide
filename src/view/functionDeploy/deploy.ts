@@ -45,6 +45,9 @@ export default class ViewDeploy {
           envNames.push(env.metadata.name);
         });
         ifunction.env = envNames;
+        if (ifunction.env.length > 0) {
+          ifunction.functionSpec.spec.environment.name = ifunction.env[0];
+        }
         panel.webview.html = this.getWebviewContent(ifunction);
       });
       this.panel.webview.html = this.getWebviewContent(ifunction);
@@ -75,8 +78,6 @@ export default class ViewDeploy {
   private deploy(configFile: string, ifunction: IFunction, commandAction: CommandAction) {
     this.save(configFile, ifunction);
     packages.create(ifunction).then(ipackage => {
-      // TODO: env setting.
-      ifunction.functionSpec.spec.environment.name = "nodejs";
       ifunction.functionSpec.spec.package.packageref.name = ipackage.packageSpec.metadata.name;
       return functions.deploy(ifunction, commandAction);
     }).then((ifunction) => {

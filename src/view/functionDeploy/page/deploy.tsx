@@ -76,6 +76,7 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           initialValues={{
             path: this.state.ifunction.path,
             functionName: this.state.ifunction.functionSpec.metadata.name,
+            environment: this.state.ifunction.functionSpec.spec.environment.name,
             entryPoint: this.state.ifunction.functionSpec.spec.package.functionName,
             packageName: this.state.ifunction.functionSpec.spec.package.functionName,
             executor: this.state.ifunction.functionSpec.spec.InvokeStrategy.ExecutionStrategy.ExecutorType,
@@ -126,6 +127,27 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
                 this.props.vscode.postMessage(command);
               }}
             />
+          </Form.Item>
+          <Form.Item
+            label="Environment"
+            name="environment"
+            rules={[{ required: true, message: 'Please select the environment' }]}
+            extra="Function environment"
+          >
+            <Select
+              value={this.state.ifunction.functionSpec.spec.environment.name}
+              onChange={(val: string) => {
+                this.state.ifunction.functionSpec.spec.environment.name = val;
+                this.props.vscode.setState({ ...this.state });
+                this.setState({ ...this.state });
+              }}
+            >
+              {this.state.ifunction.env.map(env => (
+                <option value={env}>{env}</option>
+              ))}
+              {/* <Select.Option value="poolmgr">poolmgr</Select.Option>
+              <Select.Option value="newdeploy">newdeploy</Select.Option> */}
+            </Select>
           </Form.Item>
           <Form.Item
             label="Entry Point"
