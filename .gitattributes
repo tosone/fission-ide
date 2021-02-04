@@ -5,3 +5,4 @@ doc/images/setting.png filter=lfs diff=lfs merge=lfs -text
 doc/images/sidebar.png filter=lfs diff=lfs merge=lfs -text
 doc/images/config.png filter=lfs diff=lfs merge=lfs -text
 doc/images/deploy-dir.png filter=lfs diff=lfs merge=lfs -text
+resources/fission.png filter=lfs diff=lfs merge=lfs -text

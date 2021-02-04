@@ -1,12 +1,14 @@
 {
   "name": "fission-ide",
-  "displayName": "fission-ide",
+  "displayName": "Fission IDE",
   "description": "Fission IDE",
   "publisher": "fission-ide",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "engines": {
     "vscode": "^1.52.0"
   },
+  "qna": "https://github.com/tosone/fission-ide/issues",
+  "icon": "resources/fission.png",
   "author": {
     "name": "Tosone",
     "email": "i@tosone.cn",
