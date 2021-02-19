@@ -13,7 +13,7 @@ Previously, when we created the Fission function, we had to publish it through f
 
 ### Setting
 
-First of all, you must set up the corresponding API server for Fission, which is the address of the Fission controller exposed outside the Kubernetes cluster, and do not end with a '/'.
+First of all, you must set up the corresponding API server for Fission, which is the address of the Fission controller exposed outside the Kubernetes cluster.
 
 <img src="https://media.githubusercontent.com/media/tosone/fission-ide/main/doc/images/setting.png" alt="setting" height="200px">
 

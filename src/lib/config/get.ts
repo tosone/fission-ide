@@ -2,11 +2,13 @@ import * as vscode from 'vscode';
 
 import { IConfigSpec } from './model';
 
-// TODO: check fission.server suffix with '/'
 export default function get(): IConfigSpec {
-  let server = vscode.workspace.getConfiguration("fission").get("server");
+  let server: any = vscode.workspace.getConfiguration("fission").get("server");
   if (server == undefined) {
     server = "http://127.0.0.1";
+  }
+  if (server.endsWith("/")) {
+    server = server.substring(0, server.indexOf("/"));
   }
   return {
     UrlFunctions: `${server}/v2/functions`,
