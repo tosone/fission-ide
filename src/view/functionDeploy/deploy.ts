@@ -86,10 +86,25 @@ export default class ViewDeploy {
       } else {
         if (commandAction == CommandAction.Create) {
           vscode.window.showInformationMessage(`Create function "${ifunction.functionSpec.metadata.name}" success`);
+          functions.get(ifunction.functionSpec.metadata.name).then(func => {
+            let newCommand = {
+              action: CommandAction.CreateDone,
+              content: defaultFunction
+            };
+            newCommand.content.functionSpec.metadata.resourceVersion = func.metadata.resourceVersion;
+            this.panel?.webview.postMessage(newCommand);
+          });
         } else if (commandAction == CommandAction.Update) {
+          functions.get(ifunction.functionSpec.metadata.name).then(func => {
+            let newCommand = {
+              action: CommandAction.UpdateDone,
+              content: defaultFunction
+            };
+            newCommand.content.functionSpec.metadata.resourceVersion = func.metadata.resourceVersion;
+            this.panel?.webview.postMessage(newCommand);
+          });
           vscode.window.showInformationMessage(`Update function "${ifunction.functionSpec.metadata.name}" success`);
         }
-        // TODO: After create function should change the button to 'update', but cannot get the 'resourceVersion' from resp.
         // TODO: open the test page.
       }
     });

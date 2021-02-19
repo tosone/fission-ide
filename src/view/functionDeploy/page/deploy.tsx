@@ -57,7 +57,20 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
           break;
         case CommandAction.NameNotExist:
           this.state.ifunction.functionSpec.metadata.resourceVersion = "";
+          this.setState({ ...this.state });
           this.setState({ deployAction: CommandAction.Create });
+          break;
+        case CommandAction.CreateDone:
+          console.log(CommandAction);
+          this.state.ifunction.functionSpec.metadata.resourceVersion = command.content.functionSpec.metadata.resourceVersion;
+          this.setState({ ...this.state });
+          this.setState({ deployAction: CommandAction.Update });
+          break;
+        case CommandAction.UpdateDone:
+          console.log(CommandAction);
+          this.state.ifunction.functionSpec.metadata.resourceVersion = command.content.functionSpec.metadata.resourceVersion;
+          this.setState({ ...this.state });
+          this.setState({ deployAction: CommandAction.Update });
           break;
         default:
           console.error(`Function deploy cannot find command ${command.action}`);
@@ -143,10 +156,8 @@ export default class Deploy extends React.Component<IDeployProps, IDeployState> 
               }}
             >
               {this.state.ifunction.env.map(env => (
-                <option value={env}>{env}</option>
+                <Select.Option value={env} key={env} >{env}</Select.Option>
               ))}
-              {/* <Select.Option value="poolmgr">poolmgr</Select.Option>
-              <Select.Option value="newdeploy">newdeploy</Select.Option> */}
             </Select>
           </Form.Item>
           <Form.Item
