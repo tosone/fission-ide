@@ -20,7 +20,6 @@ export default async function deploy(ifunction: IFunction, commandAction: Comman
       axiosRequestConfig.url += `/${ifunction.functionSpec.metadata.name}`;
     }
     const resp = await axios.request(axiosRequestConfig);
-    console.log(resp.status);
     if ((resp.status !== 201 && commandAction == CommandAction.Create) ||
       (resp.status !== 200 && commandAction == CommandAction.Update)) {
       ifunction.error = error.message(error.ErrorUnknown, resp);

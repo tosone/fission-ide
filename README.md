@@ -30,7 +30,7 @@ Deploy Function by context menu in the file edit area and select 'Fission Functi
 <img src="https://media.githubusercontent.com/media/tosone/fission-ide/main/doc/images/deploy-file-1.png" alt="deploy-file" height="500px">
 <img src="https://media.githubusercontent.com/media/tosone/fission-ide/main/doc/images/deploy-file-2.png" alt="deploy-file" height="500px">
 
-Although you can see a new button on the VSCode status-bar, its function will be to deploy the folder to Fission, but this feature is not yet supported.
+You can see a new button on the VSCode status-bar, its function will be to deploy the folder to Fission.
 
 <img src="https://media.githubusercontent.com/media/tosone/fission-ide/main/doc/images/deploy-dir.png" alt="deploy-file" height="500px">
 
